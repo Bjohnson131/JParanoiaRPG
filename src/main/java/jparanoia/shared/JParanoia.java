@@ -35,19 +35,23 @@ public abstract class JParanoia {
     public static final String IMG_DELIMITER = "|";
     public static final String WHITE_ON_BLACK = "White on Black";
     public static final String BLACK_ON_WHITE = "Black on White";
+    
     public static JFrame frame = new JFrame();
     public static Prefs prefs = new Prefs();
     public static JPSounds soundPlayer;
     public static SoundMenu soundMenu;
+    
     public static boolean soundIsOn;
     public static boolean combatMusicIsPlaying;
     public static boolean logBroken = false;
     public static boolean autoScroll = true;
     public static boolean announceObservers = true;
+    
     public static int previousKey = 0;
     public static int thisKey = 100;
-    public static String lastNameCompleted = "";
     public static int lastCompletionPlayer = 99;
+    
+    public static String lastNameCompleted = "";
     public static ArrayList sortedNames = new ArrayList<>( 8 );
     public static Vector obsNames = new Vector( 40 );
     public static GameLogger log;

@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Random;
 import java.util.Vector;
-import static jparanoia.server.JPServer.MIN_COMPATIBLE_VERSION_NUMBER;
 import static jparanoia.server.JPServer.absoluteChat;
 import static jparanoia.server.JPServer.actionChat;
 import static jparanoia.server.JPServer.chatThreads;
@@ -29,10 +28,12 @@ import static jparanoia.server.JPServer.reassignThreadNumbers;
 import static jparanoia.server.JPServer.spamString;
 import static jparanoia.server.JPServer.speechChat;
 import static jparanoia.server.JPServer.thoughtChat;
-import jparanoia.shared.JPVersionNumber;
 import static jparanoia.shared.JParanoia.addObsName;
 import static jparanoia.shared.JParanoia.announceObservers;
 import static jparanoia.shared.JParanoia.removeObsName;
+
+import jparanoia.server.constants.ServerConstants;
+import jparanoia.shared.JPVersionNumber;
 import org.slf4j.Logger;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -316,15 +317,15 @@ class ServerChatThread extends Thread {
     public boolean checkVersion() {
         try {
             this.out.println( "955 Identify your version" );
-            if ( new JPVersionNumber( this.in.readLine() ).compareTo( JPServer.MIN_COMPATIBLE_VERSION_NUMBER ) < 0 ) {
+            if ( new JPVersionNumber( this.in.readLine() ).compareTo( ServerConstants.MIN_COMPATIBLE_VERSION_NUMBER ) < 0 ) {
                 this.out.println( "961Incompatible version. You must have JParanoia Client version " +
-                        MIN_COMPATIBLE_VERSION_NUMBER.toString() +
+                		ServerConstants.MIN_COMPATIBLE_VERSION_NUMBER.toString() +
                         " or greater to connect to this server. The JParanoia website is: " +
                         "http://www.byronbarry.com/jparanoia/" );
                 logger.info( "Notice: Someone has attempted to connect using a client version that is too old." );
                 return false;
             }
-            this.out.println( "960" + JPServer.VERSION_NUMBER.toString() );
+            this.out.println( "960" + ServerConstants.VERSION_NUMBER.toString() );
             String str = this.in.readLine();
             if ( str.substring( 0, 3 ).equals( "961" ) ) {
                 JPServer.absoluteChat( str.substring( 3 ) );

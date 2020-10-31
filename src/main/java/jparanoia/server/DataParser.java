@@ -28,8 +28,10 @@ public class DataParser {
         this.newPlayers = new Vector();
         try {
             logger.info( "\nProcessing playerList.txt:" );
+             
             this.reader = new BufferedReader(new FileReader(DATA_FOLDER + paramString));
             this.input = this.reader.readLine();
+            
             int i = 0;
             while ( this.input != null ) {
                 if ( !this.input.startsWith( "#" ) ) {

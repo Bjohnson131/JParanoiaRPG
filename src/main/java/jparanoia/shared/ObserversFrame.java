@@ -13,8 +13,7 @@ public class ObserversFrame extends JFrame {
 
     public ObserversFrame() {
         super( "Observers" );
-        setIconImage( Toolkit.getDefaultToolkit()
-                .getImage( getClass().getClassLoader().getResource( "graphics/jparanoiaIcon.jpg" ) ) );
+        setIconImage( Toolkit.getDefaultToolkit().getImage( getClass().getClassLoader().getResource( "graphics/jparanoiaIcon.jpg" ) ) );
         Vector localVector = new Vector( 0 );
         localVector.add( "whocares" );
         this.jt = new JTable( JParanoia.obsNames, localVector );
