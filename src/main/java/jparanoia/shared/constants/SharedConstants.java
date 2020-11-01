@@ -12,6 +12,7 @@ public final class SharedConstants {
 	public static final int SELECTOR_WINDOW_WIDTH   = 610;
 	public static final int SELECTOR_WINDOW_HEIGHT  = 360;
 	
+	
 	private SharedConstants(){
 		
 	}

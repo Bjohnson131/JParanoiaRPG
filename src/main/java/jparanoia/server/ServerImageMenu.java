@@ -51,7 +51,7 @@ public class ServerImageMenu extends JMenu {
         if ( !isLink( imgLink ) ) {
             imgLink = "http://" + imgLink;
         }
-        JPServer.spamString( "404" + imgDescription + JParanoia.IMG_DELIMITER + imgLink );
+        JPServer.sendCommand( "404" + imgDescription + JParanoia.IMG_DELIMITER + imgLink );
         JParanoia.displayImage( imgDescription + JParanoia.IMG_DELIMITER + imgLink );
         if ( JPServer.keepLog ) {
             String logEntry;

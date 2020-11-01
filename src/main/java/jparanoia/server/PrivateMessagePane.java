@@ -95,7 +95,7 @@ public class PrivateMessagePane extends JPanel {
                 PrivateMessagePane.this.inputLine.setText( "" );
             }
             JPServer.inputLine.requestFocus();
-            JPServer.spamString( "211" );
+            JPServer.sendCommand( "211" );
         } );
         this.inputLine.addFocusListener( new FocusAdapter() {
             public void focusGained( FocusEvent paramAnonymousFocusEvent ) {
@@ -105,7 +105,7 @@ public class PrivateMessagePane extends JPanel {
             }
 
             public void focusLost( FocusEvent paramAnonymousFocusEvent ) {
-                JPServer.spamString( "211" );
+                JPServer.sendCommand( "211" );
             }
         } );
         this.statusPanel = new StatusPanel( this.player );

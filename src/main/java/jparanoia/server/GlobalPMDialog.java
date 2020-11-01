@@ -25,13 +25,13 @@ public class GlobalPMDialog extends JFrame {
         super( "Global PM..." );
         addWindowListener( new WindowAdapter() {
             public void windowClosing( WindowEvent paramAnonymousWindowEvent ) {
-                JPServer.spamString( "211" );
+                JPServer.sendCommand( "211" );
             }
         } );
         resetExcludeCheckBoxes();
         this.resetButton.addActionListener( paramAnonymousActionEvent -> {
             GlobalPMDialog.this.textField.setText( "" );
-            JPServer.spamString( "211" );
+            JPServer.sendCommand( "211" );
             GlobalPMDialog.resetExcludeCheckBoxes();
         } );
         this.resetButton.setAlignmentX( 0.5F );
@@ -72,7 +72,7 @@ public class GlobalPMDialog extends JFrame {
         for ( final ServerPlayer t : ts ) {
             t.sendGlobalPM( paramString );
         }
-        JPServer.spamString( "211" );
+        JPServer.sendCommand( "211" );
         dispose();
     }
 

@@ -3,9 +3,12 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.Serializable;
+
 import static java.lang.System.exit;
 import static java.lang.System.out;
 import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -17,9 +20,11 @@ import javax.swing.text.StyleContext;
 import static jparanoia.server.JPServer.absoluteChat;
 import static jparanoia.server.JPServer.absoluteSpam;
 import static jparanoia.server.JPServer.repaintMenus;
-import static jparanoia.server.JPServer.spamString;
+import static jparanoia.server.JPServer.sendCommand;
 import static jparanoia.server.JPServer.spareNpcs;
 import static jparanoia.server.JPServer.stripComments;
+
+import jparanoia.server.constants.ServerConstants;
 import jparanoia.shared.JPPlayer;
 import static jparanoia.shared.JPSounds.CHARSHEET_ALERT;
 import static jparanoia.shared.JPSounds.DEMOTED;
@@ -32,8 +37,12 @@ import static jparanoia.shared.JParanoia.soundPlayer;
 import org.slf4j.Logger;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class ServerPlayer extends JPPlayer {
-    private final static Logger logger = getLogger( MethodHandles.lookup().lookupClass());
+public class ServerPlayer extends JPPlayer implements Serializable {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1355967379808152673L;
+	private final static Logger logger = getLogger( MethodHandles.lookup().lookupClass());
 
     static int numUnsavedCharsheets = 0;
     static FileWriter writer;
@@ -58,15 +67,26 @@ public class ServerPlayer extends JPPlayer {
     private boolean debugSpecific = false;
     private String name;
     private String clearance;
-    private int clearanceInt;
+    public int clearanceInt;
     private String sector;
     private String password;
     private String realName;
     private ServerPlayerMenu playerMenu;
     private NPCMenu npcMenu;
     private JCheckBox globalExcludeCheckBox;
+    private HashMap<String,Integer> securityClearance = new HashMap<String,Integer>();
+
 
     public ServerPlayer( int playerNumber, String name, boolean isPlayer, String password, String dataFile ) {
+        securityClearance.put("IR",0);
+        securityClearance.put("R" ,1);
+        securityClearance.put("O" ,2);
+        securityClearance.put("Y" ,3);
+        securityClearance.put("G" ,4);
+        securityClearance.put("B" ,5);
+        securityClearance.put("I" ,6);
+        securityClearance.put("V" ,7);
+        securityClearance.put("U" ,8);        
         this.PLAYER_NUMBER = playerNumber;
         this.password = password;
         this.IS_PLAYER = isPlayer;
@@ -112,7 +132,7 @@ public class ServerPlayer extends JPPlayer {
             }
             String newName;
             if ( this.PLAYER_NUMBER == 0 ) {
-                if ( JPServer.gmNameNag && this.data.substring( 0, this.data.length() - 2 ).equals( "GM" ) ) {
+                if ( JPServer.serverOptions.isGmNameNag() && this.data.substring( 0, this.data.length() - 2 ).equals( "GM" ) ) {
                     newName = (String) JOptionPane.showInputDialog( null, "Your name, as defined in your " +
                             "own charsheet file, " +
                             this.dataFile +
@@ -332,16 +352,16 @@ public class ServerPlayer extends JPPlayer {
 
     public void kill() {
         if ( isAnActualPlayer() && !this.isDead ) {
-            if ( this.cloneNumber < JPServer.maxNumClones || JPServer.isPXPGame ) {
+            if ( this.cloneNumber < JPServer.serverOptions.getMaxNumClones() || JPServer.serverOptions.isPXPGame() ) {
                 String str1 = this.name;
                 String str2 = deathEuphamism( toString() );
                 this.cloneNumber += 1;
                 JPServer.absoluteChat( str2 );
-                JPServer.spamString( "199" + str2 );
+                JPServer.sendCommand( "199" + str2 );
             } else {
                 this.isDead = true;
                 JPServer.absoluteChat( toString() + " has died and has no clones left! Oh, the humanity!!" );
-                JPServer.spamString( "199" + toString() + " has died and has no clones left! Oh, the humanity!!" );
+                JPServer.sendCommand( "199" + toString() + " has died and has no clones left! Oh, the humanity!!" );
                 this.name = "(dead)" + this.name;
             }
             JPServer.notifyPlayersOfDeath( this );
@@ -351,7 +371,7 @@ public class ServerPlayer extends JPPlayer {
             JPServer.absoluteChat( "The GM has attempted to kill " +
                     this.name +
                     " one more time. This is, of course, impossible." );
-            JPServer.spamString( "199The GM has attempted to kill " +
+            JPServer.sendCommand( "199The GM has attempted to kill " +
                     this.name +
                     " one more time. This is, of course, impossible." );
         }
@@ -362,14 +382,14 @@ public class ServerPlayer extends JPPlayer {
             if ( this.isDead ) {
                 this.isDead = false;
                 JPServer.absoluteChat( toString() + " has been refunded a clone due to a clerical error." );
-                JPServer.spamString( "199" + toString() + " has been refunded a clone due to a clerical error." );
+                JPServer.sendCommand( "199" + toString() + " has been refunded a clone due to a clerical error." );
                 this.name = this.name.substring( 6 );
                 JPServer.notifyPlayersOfUndeath( this );
                 JPServer.spoofComboBox.repaint();
                 saveCharsheet( false );
             } else if ( this.cloneNumber > 1 ) {
                 JPServer.absoluteChat( toString() + " has been refunded a clone due to a clerical error." );
-                JPServer.spamString( "199" + toString() + " has been refunded a clone due to a clerical error." );
+                JPServer.sendCommand( "199" + toString() + " has been refunded a clone due to a clerical error." );
                 this.cloneNumber -= 1;
                 JPServer.notifyPlayersOfUndeath( this );
                 JPServer.spoofComboBox.repaint();
@@ -378,7 +398,7 @@ public class ServerPlayer extends JPPlayer {
                 JPServer.absoluteChat( "The GM has attempted to give " +
                         toString() +
                         " another clone. This is, of course, impossible." );
-                JPServer.spamString( "199The GM has attempted to give " +
+                JPServer.sendCommand( "199The GM has attempted to give " +
                         toString() +
                         " another clone. This is, of course, impossible." );
             }
@@ -388,52 +408,8 @@ public class ServerPlayer extends JPPlayer {
     private String deathEuphamism( String paramString ) {
         int i = JPServer.rand.nextInt( 14 );
         String str = paramString + " ";
-        switch ( i ) {
-            case 0:
-                str = str + "has gone to Great Alpha Complex in the Sky.";
-                break;
-            case 1:
-                str = str + "has kicked the synthe-bucket.";
-                break;
-            case 2:
-                str = str + "has been visited by the reaper-bot.";
-                break;
-            case 3:
-                str = str + "has shuffled off this mortal sector.";
-                break;
-            case 4:
-                str = str + "has got bored of his present clone.";
-                break;
-            case 5:
-                str = str + "has bought the highly-treasonous farm.";
-                break;
-            case 6:
-                str = str + "has drunk his last bottle of Bouncy Bubble Beverage.";
-                break;
-            case 7:
-                str = str + "has eaten his last Hot Fun.";
-                break;
-            case 8:
-                str = str + "is pushing up traitorous daises.";
-                break;
-            case 9:
-                str = str + "has passed onto a better sector.";
-                break;
-            case 10:
-                str = str + "has exited, vid-stage left.";
-                break;
-            case 11:
-                str = str + "is, alas, no more.";
-                break;
-            case 12:
-                str = str + "has passed away.";
-                break;
-            case 13:
-                str = str + "has ceased to show any signs of life.";
-                break;
-            case 14:
-                str = str + "has cashed in his credits.";
-        }
+        
+        str = str + ServerConstants.DEATH_MESSAGES[i];
         return str;
     }
 
@@ -509,7 +485,7 @@ public class ServerPlayer extends JPPlayer {
             } catch ( Exception localException ) {
                 errorMessage( "Invalid name", "You have entered a name incompatible\nwith the standards set forth by Friend\nComputer. Report for termination." );
             }
-            spamString( "199" + str1 + " has been replaced by " + str5 );
+            sendCommand( "199" + str1 + " has been replaced by " + str5 );
             absoluteChat( str1 + " has been replaced by " + str5 );
             String str6;
             if ( this.loggedIn ) {
@@ -522,7 +498,7 @@ public class ServerPlayer extends JPPlayer {
             this.globalExcludeCheckBox.setText( getName() );
             repaintMenus();
             this.playerMenu.setText( getName() );
-            spamString( "010" + getID() + "p" + str6 + str5 + "-" + this.cloneNumber );
+            sendCommand( "010" + getID() + "p" + str6 + str5 + "-" + this.cloneNumber );
             saveCharsheet( false );
             this.pmPane.reflectNameChange();
         }
@@ -536,13 +512,13 @@ public class ServerPlayer extends JPPlayer {
             if ( JPServer.soundIsOn && JPServer.soundMenu.promotedDemotedMenuItem.isSelected() ) {
                 JPServer.soundPlayer.play( DEMOTED );
             }
-            JPServer.spamString( "020" );
+            JPServer.sendCommand( "020" );
         } else if ( i > this.clearanceInt ) {
             str1 = "promoted";
             if ( JPServer.soundIsOn && JPServer.soundMenu.promotedDemotedMenuItem.isSelected() ) {
                 JPServer.soundPlayer.play( PROMOTED );
             }
-            JPServer.spamString( "021" );
+            JPServer.sendCommand( "021" );
         } else {
             return;
         }
@@ -557,82 +533,16 @@ public class ServerPlayer extends JPPlayer {
         }
         JPServer.repaintMenus();
         this.playerMenu.setText( getName() );
-        JPServer.spamString( "010" + getID() + "p" + str2 + getName() + "-" + this.cloneNumber );
+        JPServer.sendCommand( "010" + getID() + "p" + str2 + getName() + "-" + this.cloneNumber );
         saveCharsheet( false );
     }
 
-    public int evaluateClearance( String paramString ) {
-        if ( this.playerMenu != null ) {
-            if ( paramString.equals( "IR" ) ) {
-                this.playerMenu.playerClearanceMenu.securityInfraMenuItem.setSelected( true );
-                return 0;
-            }
-            if ( paramString.equals( "R" ) ) {
-                this.playerMenu.playerClearanceMenu.securityRedMenuItem.setSelected( true );
-                return 1;
-            }
-            if ( paramString.equals( "O" ) ) {
-                this.playerMenu.playerClearanceMenu.securityOrangeMenuItem.setSelected( true );
-                return 2;
-            }
-            if ( paramString.equals( "Y" ) ) {
-                this.playerMenu.playerClearanceMenu.securityYellowMenuItem.setSelected( true );
-                return 3;
-            }
-            if ( paramString.equals( "G" ) ) {
-                this.playerMenu.playerClearanceMenu.securityGreenMenuItem.setSelected( true );
-                return 4;
-            }
-            if ( paramString.equals( "B" ) ) {
-                this.playerMenu.playerClearanceMenu.securityBlueMenuItem.setSelected( true );
-                return 5;
-            }
-            if ( paramString.equals( "I" ) ) {
-                this.playerMenu.playerClearanceMenu.securityIndigoMenuItem.setSelected( true );
-                return 6;
-            }
-            if ( paramString.equals( "V" ) ) {
-                this.playerMenu.playerClearanceMenu.securityVioletMenuItem.setSelected( true );
-                return 7;
-            }
-            if ( paramString.equals( "U" ) ) {
-                this.playerMenu.playerClearanceMenu.securityUltraMenuItem.setSelected( true );
-                return 8;
-            }
-        } else {
-            if ( paramString.equals( "IR" ) ) {
-                return 0;
-            }
-            if ( paramString.equals( "R" ) ) {
-                return 1;
-            }
-            if ( paramString.equals( "O" ) ) {
-                return 2;
-            }
-            if ( paramString.equals( "Y" ) ) {
-                return 3;
-            }
-            if ( paramString.equals( "G" ) ) {
-                return 4;
-            }
-            if ( paramString.equals( "B" ) ) {
-                return 5;
-            }
-            if ( paramString.equals( "I" ) ) {
-                return 6;
-            }
-            if ( paramString.equals( "V" ) ) {
-                return 7;
-            }
-            if ( paramString.equals( "U" ) ) {
-                return 8;
-            }
+    public int evaluateClearance(String clearance){
+        int clearanceInt = securityClearance.get(clearance);
+        if(this.playerMenu != null) {
+        	this.getPlayerMenu().playerClearanceMenu.securityClearancesByRank[clearanceInt].setSelected(true);
         }
-        return -99;
-    }
-
-    public int getClearanceInt() {
-        return this.clearanceInt;
+        return clearanceInt;
     }
 
     public ServerChatThread getThread() {
@@ -699,29 +609,7 @@ public class ServerPlayer extends JPPlayer {
     }
 
     public void sendLastSavedCharsheet() {
-/*        logger.info( "Sending " + getName() + " their last saved char sheet..." );
-        specificSend( "400" );
-        try {
-            final ClassLoader classLoader = lookup().lookupClass().getClassLoader();
-            final File file = new File( requireNonNull( classLoader.getResource( dataFile ) ).getFile() );
-            this.reader = new BufferedReader( new InputStreamReader( new FileInputStream( file ) ) );
-            StringBuilder localStringBuffer = new StringBuilder();
-            String str = this.reader.readLine();
-            str = this.reader.readLine();
-            while ( str != null ) {
-                if ( !str.startsWith( "#" ) ) {
-                    localStringBuffer.append( str ).append( "\n" );
-                }
-                str = this.reader.readLine();
-            }
-            this.reader.close();
-            specificSend( stripComments( localStringBuffer.toString() ) );
-        } catch ( Exception localException ) {
-            logger.info( "Bad location exception while sending charsheet." );
-        }
-        specificSend( "402" );
-    }
-*/
+
         logger.info( "Sending " + getName() + " their char sheet..." );
         specificSend( "400" );
         try {
@@ -829,7 +717,7 @@ public class ServerPlayer extends JPPlayer {
             this.name = str;
             JPServer.repaintMenus();
             this.npcMenu.setText( getName() );
-            JPServer.spamString( "010" + getID() + "n" + "n" + str );
+            JPServer.sendCommand( "010" + getID() + "n" + "n" + str );
         }
     }
 }
@@ -839,3 +727,28 @@ public class ServerPlayer extends JPPlayer {
  * Java compiler version: 2 (46.0)
  * JD-Core Version:       0.7.1
  */
+
+
+/*        logger.info( "Sending " + getName() + " their last saved char sheet..." );
+specificSend( "400" );
+try {
+    final ClassLoader classLoader = lookup().lookupClass().getClassLoader();
+    final File file = new File( requireNonNull( classLoader.getResource( dataFile ) ).getFile() );
+    this.reader = new BufferedReader( new InputStreamReader( new FileInputStream( file ) ) );
+    StringBuilder localStringBuffer = new StringBuilder();
+    String str = this.reader.readLine();
+    str = this.reader.readLine();
+    while ( str != null ) {
+        if ( !str.startsWith( "#" ) ) {
+            localStringBuffer.append( str ).append( "\n" );
+        }
+        str = this.reader.readLine();
+    }
+    this.reader.close();
+    specificSend( stripComments( localStringBuffer.toString() ) );
+} catch ( Exception localException ) {
+    logger.info( "Bad location exception while sending charsheet." );
+}
+specificSend( "402" );
+}
+*/

@@ -15,7 +15,7 @@ public class SendImageMenuItem extends JMenuItem {
         super( paramJPImage.getName() );
         this.imageItem = paramJPImage;
         addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "404" + SendImageMenuItem.this.getImageInfo() );
+            JPServer.sendCommand( "404" + SendImageMenuItem.this.getImageInfo() );
             JParanoia.displayImage( SendImageMenuItem.this.getImageInfo() );
             if ( JPServer.keepLog ) {
                 String str;

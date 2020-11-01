@@ -25,7 +25,7 @@ import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.WindowConstants;
 import static jparanoia.server.JPServer.absoluteChat;
-import static jparanoia.server.JPServer.spamString;
+import static jparanoia.server.JPServer.sendCommand;
 import static jparanoia.server.JPServer.troubleshooters;
 import jparanoia.shared.ErrorLogger;
 import static jparanoia.shared.JParanoia.errLog;
@@ -183,7 +183,7 @@ public class CombatFrame extends JFrame {
             CombatFrame.this.proposedPublicTurn.setText( "Player skipped. Select next player." );
             CombatFrame.this.secretTurn.setText( "" );
             CombatFrame.this.currentPlayer.specificSend( "609" );
-            JPServer.spamString( "199" + CombatFrame.this.currentPlayer.getName() + "'s turn was skipped." );
+            JPServer.sendCommand( "199" + CombatFrame.this.currentPlayer.getName() + "'s turn was skipped." );
             JPServer.absoluteChat( CombatFrame.this.currentPlayer.getName() + "'s turn was skipped." );
             for ( int i = 0; i < CombatFrame.this.waitingPlayers.size(); i++ ) {
                 CombatButton localCombatButton = (CombatButton) CombatFrame.this.waitingPlayers.elementAt( i );
@@ -235,11 +235,11 @@ public class CombatFrame extends JFrame {
         String str1;
         if ( str2.startsWith( "/" ) ) {
             str1 = "110";
-            JPServer.spamString( str1 + str3 + str2.substring( 1 ) );
+            JPServer.sendCommand( str1 + str3 + str2.substring( 1 ) );
             JPServer.actionChat( str3 + str2.substring( 1 ) );
         } else if ( str2.startsWith( "'" ) ) {
             str1 = "120";
-            JPServer.spamString( str1 + str3 + str2.substring( 1 ) );
+            JPServer.sendCommand( str1 + str3 + str2.substring( 1 ) );
             JPServer.speechChat( str3 + str2.substring( 1 ) );
         }
         this.skipButton.setEnabled( false );
@@ -247,8 +247,8 @@ public class CombatFrame extends JFrame {
     }
 
     void abortCombat() {
-        spamString( "609" );
-        spamString( "199(GM aborted combat)" );
+        sendCommand( "609" );
+        sendCommand( "199(GM aborted combat)" );
         absoluteChat( "(GM aborted combat)" );
         for ( final ServerPlayer troubleshooter : troubleshooters ) {
             if ( troubleshooter.isLoggedIn() ) {
@@ -264,8 +264,8 @@ public class CombatFrame extends JFrame {
     }
 
     void endCombat() {
-        JPServer.spamString( "199*** COMBAT ROUND COMPLETE ***" );
-        JPServer.spamString( "597" );
+        JPServer.sendCommand( "199*** COMBAT ROUND COMPLETE ***" );
+        JPServer.sendCommand( "597" );
         JPServer.absoluteChat( "*** COMBAT ROUND COMPLETE ***" );
         JPServer.absoluteChat( "(Remember to Unfreeze your players to resume normal play.)" );
         JPServer.freezeButton.setEnabled( true );

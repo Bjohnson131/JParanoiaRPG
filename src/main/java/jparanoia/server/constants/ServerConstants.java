@@ -41,6 +41,7 @@ public final class ServerConstants {
 	
 	//Constants related to the warning that the server is not on the same local IP as the clients
 	public static final String WARN_BEHIND_ROUTER = "Behind a router";
+	public static final String WARN_NO_IP = "Error: Unable to get local host address";
 	private static final Pattern IP_REPLACE_REGEX = Pattern.compile("{IP}");
 	private static final String ROUTER_WARNING_RAW = 
 	        "The JParanoia Game Registry has determined\nthat your computer is behind a router."
@@ -52,6 +53,27 @@ public final class ServerConstants {
 			+ "you run this program. To disable this reminder\n"
 			+ "completely, edit the jpConfig.ini file such that\n" + "BehindRouter=true";
 	private static final Matcher ROUTER_WARNING_MATCHER = IP_REPLACE_REGEX.matcher(ROUTER_WARNING_RAW);
+	
+	
+	//Death messages
+	public static final String[] DEATH_MESSAGES = {
+			"has gone to Great Alpha Complex in the Sky.",
+			"has kicked the synthe-bucket.",
+			"has been visited by the reaper-bot.",
+			"has shuffled off this mortal sector.",
+			"has got bored of his present clone.",
+			"has bought the highly-treasonous farm.",
+			"has drunk his last bottle of Bouncy Bubble Beverage.",
+			"has eaten his last Hot Fun.",
+			"is pushing up traitorous daises.",
+			"has passed onto a better sector.",
+			"has exited, vid-stage left.",
+			"is, alas, no more.",
+			"has passed away.",
+			"has ceased to show any signs of life.",
+			"has cashed in his credits."
+	};
+	
 	
 	
 	

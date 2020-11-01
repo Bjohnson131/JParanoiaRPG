@@ -26,6 +26,9 @@ import javax.swing.text.StyledDocument;
 import static jparanoia.shared.JPSounds.STARTUP;
 import static jparanoia.shared.Prefs.PLAY_SOUNDS;
 import org.slf4j.Logger;
+
+import jparanoia.server.ServerPlayer;
+
 import static org.slf4j.LoggerFactory.getLogger;
 
 public abstract class JParanoia {
@@ -52,14 +55,14 @@ public abstract class JParanoia {
     public static int lastCompletionPlayer = 99;
     
     public static String lastNameCompleted = "";
-    public static ArrayList sortedNames = new ArrayList<>( 8 );
+    public static ArrayList<ServerPlayer> sortedNames = new ArrayList<ServerPlayer>( 8 );
     public static Vector obsNames = new Vector( 40 );
     public static GameLogger log;
     public static ErrorLogger errLog;
     public static JMenuItem aboutBoxMenuItem;
     public static StringTokenizer st;
     public static Color textColor = Color.white;
-    public static JTextPane displayArea;
+    public static JTextPane displayArea = new JTextPane();
     public static SimpleAttributeSet textAttributes;
     public static StyledDocument chatDocument;
     public static ObserversFrame obsFrame = new ObserversFrame();
@@ -70,6 +73,9 @@ public abstract class JParanoia {
     static NoTabFocusManager ntfm = new NoTabFocusManager();
 
     public JParanoia() {
+    	
+    	//Code related to setting up sound
+    	//[SOUND] [INIT]
         if ( (Boolean) prefs.getPref( PLAY_SOUNDS ) ) {
             soundPlayer = new JPSounds();
             soundIsOn = true;
@@ -78,6 +84,9 @@ public abstract class JParanoia {
         if ( soundIsOn && soundMenu.startupMenuItem.isSelected() ) {
             soundPlayer.play( STARTUP );
         }
+        
+        //Fetch the Icon dynamically from URL
+        //[NETWORK] []
         try {
             aboutIconURL = new URL( "http://www.byronbarry.com/jparanoia/aboutIcon.jpg" );
         } catch ( Exception localException ) {

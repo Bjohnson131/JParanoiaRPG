@@ -25,7 +25,7 @@ import static jparanoia.server.JPServer.playerHasLeft;
 import static jparanoia.server.JPServer.players;
 import static jparanoia.server.JPServer.privateMessageHandler;
 import static jparanoia.server.JPServer.reassignThreadNumbers;
-import static jparanoia.server.JPServer.spamString;
+import static jparanoia.server.JPServer.sendCommand;
 import static jparanoia.server.JPServer.speechChat;
 import static jparanoia.server.JPServer.thoughtChat;
 import static jparanoia.shared.JParanoia.addObsName;
@@ -83,25 +83,25 @@ class ServerChatThread extends Thread {
                             this.listening = false;
                             break;
                         case 99:
-                            spamString( str );
+                            sendCommand( str );
                             if ( hearObserversMenuItem.isSelected() ) {
                                 observerChat( str.substring( 3 ) );
                             }
                             break;
                         case 100:
-                            spamString( str );
+                            sendCommand( str );
                             generalChat( str.substring( 3 ) );
                             break;
                         case 110:
-                            spamString( str );
+                            sendCommand( str );
                             actionChat( str.substring( 3 ) );
                             break;
                         case 120:
-                            spamString( str );
+                            sendCommand( str );
                             speechChat( str.substring( 3 ) );
                             break;
                         case 130:
-                            spamString( str );
+                            sendCommand( str );
                             thoughtChat( str.substring( 3 ) );
                             break;
                         case 199:
@@ -145,7 +145,7 @@ class ServerChatThread extends Thread {
         } catch ( SocketException localSocketException ) {
             if ( !this.observer && !this.disconnectCalled ) {
                 logger.info( this.thisPlayer.getName() + " unexpectedly lost their connection. (SocketException)" );
-                spamString( "199" +
+                sendCommand( "199" +
                         this.thisPlayer.getName() +
                         " unexpectedly lost their connection. (SocketException)" );
                 absoluteChat( this.thisPlayer.getName() +
@@ -155,7 +155,7 @@ class ServerChatThread extends Thread {
         } catch ( IOException localIOException ) {
             if ( !this.observer && !this.disconnectCalled ) {
                 logger.info( this.thisPlayer.getName() + " unexpectedly lost their connection. (IOException)" );
-                spamString( "199" +
+                sendCommand( "199" +
                         this.thisPlayer.getName() +
                         " unexpectedly lost their connection. (IOException)" );
                 absoluteChat( this.thisPlayer.getName() +
@@ -166,7 +166,7 @@ class ServerChatThread extends Thread {
         } catch ( Exception localException ) {
             if ( !this.observer && !this.disconnectCalled ) {
                 logger.info( this.thisPlayer.getName() + " unexpectedly lost their connection. (Exception)" );
-                spamString( "199" +
+                sendCommand( "199" +
                         this.thisPlayer.getName() +
                         " unexpectedly lost their connection. (Exception)" );
                 absoluteChat( this.thisPlayer.getName() + " unexpectedly lost their connection. (Exception)" );
@@ -293,7 +293,7 @@ class ServerChatThread extends Thread {
             localIOException.printStackTrace();
         }
         if ( !this.observer ) {
-            JPServer.spamString( "011" + this.playerID );
+            JPServer.sendCommand( "011" + this.playerID );
             JPServer.playerHasJoined( this.playerID );
         } else {
             numberOfConnectedObservers += 1;
@@ -391,7 +391,7 @@ class ServerChatThread extends Thread {
         if ( !this.thisPlayer.isLoggedIn() ) {
             logger.info( "Unknown user disconnected. (Not signed in.)" );
         } else {
-            JPServer.spamString( "012" + this.playerID );
+            JPServer.sendCommand( "012" + this.playerID );
             System.out.print( this.thisPlayer.getName() + " disconnected... " );
             this.thisPlayer.setThread( null );
         }

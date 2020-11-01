@@ -92,52 +92,52 @@ public class ServerOptionsMenu extends JMenu {
         this.computerFontIncreaseMenu.setToolTipText( "<HTML>Amount to increase<BR>The Computer's font size.</HTML>" );
         this.cpuIncrease0 = new JRadioButtonMenuItem( "None" );
         this.cpuIncrease0.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "0700" );
+            JPServer.sendCommand( "0700" );
             JPServer.computerFontIncrease = 0;
         } );
         this.cpuIncrease2 = new JRadioButtonMenuItem( "2 points" );
         this.cpuIncrease2.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "0702" );
+            JPServer.sendCommand( "0702" );
             JPServer.computerFontIncrease = 2;
         } );
         this.cpuIncrease4 = new JRadioButtonMenuItem( "4 points" );
         this.cpuIncrease4.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "0704" );
+            JPServer.sendCommand( "0704" );
             JPServer.computerFontIncrease = 4;
         } );
         this.cpuIncrease6 = new JRadioButtonMenuItem( "6 points" );
         this.cpuIncrease6.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "0706" );
+            JPServer.sendCommand( "0706" );
             JPServer.computerFontIncrease = 6;
         } );
         this.cpuIncrease8 = new JRadioButtonMenuItem( "8 points" );
         this.cpuIncrease8.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "0708" );
+            JPServer.sendCommand( "0708" );
             JPServer.computerFontIncrease = 8;
         } );
         this.cpuIncrease10 = new JRadioButtonMenuItem( "10 points" );
         this.cpuIncrease10.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "07010" );
+            JPServer.sendCommand( "07010" );
             JPServer.computerFontIncrease = 10;
         } );
         this.cpuIncrease12 = new JRadioButtonMenuItem( "12 points" );
         this.cpuIncrease12.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "07012" );
+            JPServer.sendCommand( "07012" );
             JPServer.computerFontIncrease = 12;
         } );
         this.cpuIncrease14 = new JRadioButtonMenuItem( "14 points" );
         this.cpuIncrease14.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "07014" );
+            JPServer.sendCommand( "07014" );
             JPServer.computerFontIncrease = 14;
         } );
         this.cpuIncrease16 = new JRadioButtonMenuItem( "16 points" );
         this.cpuIncrease16.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "07016" );
+            JPServer.sendCommand( "07016" );
             JPServer.computerFontIncrease = 16;
         } );
         this.cpuIncrease18 = new JRadioButtonMenuItem( "18 points" );
         this.cpuIncrease18.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.spamString( "07018" );
+            JPServer.sendCommand( "07018" );
             JPServer.computerFontIncrease = 18;
         } );
         ButtonGroup localButtonGroup = new ButtonGroup();
