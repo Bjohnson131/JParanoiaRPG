@@ -136,19 +136,13 @@ public class ServerPlayer extends JPPlayer implements Serializable {
             String newName;
             if ( this.PLAYER_NUMBER == 0 ) {
                 if ( JPServer.serverOptions.isGmNameNag() && this.data.substring( 0, this.data.length() - 2 ).equals( "GM" ) ) {
-                    newName = (String) JOptionPane.showInputDialog( null, "Your name, as defined in your " +
-                            "own charsheet file, " +
-                            this.dataFile +
-                            "\n" +
-                            "is \"GM\". This does not make you very unique. You can choose a name here\n" +
-                            "but it will be forgotten when you exit JParanoia. To choose a lasting name,\n" +
-                            "you must change the first line of your charsheet file.\n" +
-                            "Just be sure to leave the -0 on the end.\n" +
-                            "\n" +
-                            "(You can click Cancel to keep \"GM\" if you so choose.\n" +
-                            "To permanently surpress this notice, set bGmNameNag=false\n" +
-                            "in your jpConfig.ini file.)", "Boring GM Name...", JOptionPane.PLAIN_MESSAGE, null, null, "GM" );
-                    if ( newName != null && !newName.equals( "" ) ) {
+                    newName = (String) JOptionPane.showInputDialog( null, 
+                    		ServerConstants.PLAYER_NAME_IS_GM_WARNING +
+                            this.dataFile + 
+                            ServerConstants.PLAYER_NAME_IS_GM_WARNING_DESCRIPTION,
+                            ServerConstants.PLAYER_NAME_IS_GM_WARNING_TITLE, 
+                            JOptionPane.PLAIN_MESSAGE, null, null, "GM" );
+                    if ( newName != null && !"".equals( newName ) ) {
                         this.name = newName;
                     } else {
                         logger.info( "NUNAME == " + newName );
@@ -181,14 +175,14 @@ public class ServerPlayer extends JPPlayer implements Serializable {
                     logger.info( "2 tokens in \"" + str + "\", assigning Infrared clearance." );
                     this.clearance = "IR";
                 } else {
-                    this.clearance = str.substring( str.indexOf( "-" ) + 1, str.lastIndexOf( "-" ) );
+                    this.clearance = str.substring( str.indexOf( '-' ) + 1, str.lastIndexOf( '-' ) );
                 }
                 if ( ( this.clearanceInt = evaluateClearance( this.clearance ) ) == -99 ) {
-                    errorMessage( "Invalid clearance", "The character sheet " +
-                            this.dataFile +
-                            ServerConstants.INVALID_CLONE_WARNING+
-                            this.clearance +
-                            ServerConstants.INVALID_CLONE_WARNING_DESCRIPTION);
+                    errorMessage(
+                    		ServerConstants.INVALID_CLEARANCE_WARNING_TITLE,
+                            this.dataFile + ServerConstants.INVALID_CLEARANCE_WARNING+
+                            this.clearance + ServerConstants.INVALID_CLEARANCE_WARNING_DESCRIPTION+
+                            ServerConstants.INVALID_CLEARANCE_REMEDY_SERVER);
                     exit( 0 );
                 }
                 this.sector = str.substring( str.lastIndexOf( "-" ) + 1 );
@@ -399,22 +393,10 @@ public class ServerPlayer extends JPPlayer implements Serializable {
                 }
                 int i;
                 if ( ( i = evaluateClearance( str3 ) ) == -99 ) {
-                    errorMessage( "Invalid clearance", "Security clearance \"" +
-                            str3 +
-                            "\" is invalid.\n" +
-                            "\n" +
-                            "Allowed clearance codes are:\n" +
-                            "(blank) = infrared\n" +
-                            "R = red\n" +
-                            "O = orange\n" +
-                            "Y = yellow\n" +
-                            "G = green\n" +
-                            "B = blue\n" +
-                            "I = indigo\n" +
-                            "V = violet\n" +
-                            "U = ultraviolet\n" +
-                            "\n" +
-                            "Try again." );
+                    errorMessage(ServerConstants.INVALID_CLEARANCE_WARNING_TITLE, 
+                    		ServerConstants.INVALID_CLEARANCE_SEC_CLRNCE +
+                            str3 + ServerConstants.INVALID_CLEARANCE_INVALID + 
+                            ServerConstants.INVALID_CLEARANCE_WARNING_DESCRIPTION);
                     return;
                 }
                 this.clearanceInt = i;
@@ -477,8 +459,11 @@ public class ServerPlayer extends JPPlayer implements Serializable {
     }
 
     public int evaluateClearance(String clearance){
-        int clearanceInt = ServerPlayer.securityClearance.get(clearance);
-        if(this.playerMenu != null) {
+    	int clearanceInt = -99;
+    	if(ServerPlayer.securityClearance.containsKey(clearance)){
+    		clearanceInt = ServerPlayer.securityClearance.get(clearance);
+    	}
+        if(this.playerMenu != null && clearanceInt != -99) {
         	this.getPlayerMenu().playerClearanceMenu.securityClearancesByRank[clearanceInt].setSelected(true);
         }
         return clearanceInt;
@@ -558,6 +543,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
         }
         specificSend( "402" );
     }
+    
     //The above code within the fuction, that isn't commented, is copied from 'public void sendCharsheet()' as that code still works.
     public void saveCharsheet( boolean paramBoolean ) {
         String str = null;

@@ -74,8 +74,16 @@ public final class ServerConstants {
 			"has cashed in his credits."
 	};
 	
-	public static final String INVALID_CLONE_WARNING_DESCRIPTION = 
-			"\".\n\nAllowed clearance codes are:\n" +
+
+	/* Invalid clone error message.
+	 * Used by the ServerPlayer class to warn that the current player has an incorrect clearance.
+	 * */
+	public static final String INVALID_CLEARANCE_WARNING_TITLE = "Invalid clearance";
+	public static final String INVALID_CLEARANCE_WARNING = "The character sheet " +"\n" +
+            "attempts to grant a player an\n" +
+            "invalid security clearance ";
+	public static final String INVALID_CLEARANCE_WARNING_DESCRIPTION = 
+			"\n\nAllowed clearance codes are:\n" +
             "(blank) = infrared\n" +
             "R = red\n" +
             "O = orange\n" +
@@ -85,12 +93,24 @@ public final class ServerConstants {
             "I = indigo\n" +
             "V = violet\n" +
             "U = ultraviolet\n" +
+            "\n";
+	public static final String INVALID_CLEARANCE_REMEDY_SERVER = "Correct the error and relaunch the server.\n";
+	public static final String INVALID_CLEARANCE_SEC_CLRNCE = "Security clearance " ;
+	public static final String INVALID_CLEARANCE_INVALID = " is invalid. \n" ;
+	
+	
+	/**/
+	public static final String PLAYER_NAME_IS_GM_WARNING_TITLE = "Boring GM Name...";
+	public static final String PLAYER_NAME_IS_GM_WARNING = "Your name, as defined in your own charsheet file, ";
+	public static final String PLAYER_NAME_IS_GM_WARNING_DESCRIPTION = "\n" +
+            "is \"GM\". This does not make you very unique. You can choose a name here\n" +
+            "but it will be forgotten when you exit JParanoia. To choose a lasting name,\n" +
+            "you must change the first line of your charsheet file.\n" +
+            "Just be sure to leave the -0 on the end.\n" +
             "\n" +
-            "Correct the error and relaunch the server.";
-	public static final String INVALID_CLONE_WARNING = "";
-	
-	
-	
+            "(You can click Cancel to keep \"GM\" if you so choose.\n" +
+            "To permanently surpress this notice, set bGmNameNag=false\n" +
+            "in your jpConfig.ini file.)";
 	
 	
 	private ServerConstants() {
