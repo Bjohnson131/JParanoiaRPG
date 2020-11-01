@@ -126,8 +126,7 @@ public class JPServer extends JParanoia {
 	private static int numberOfConnectedObservers = 0;
 	private static int randInt = rand.nextInt(1000);
 	private static Integer mainFontSize = 99;
-	private static TitleClass myTitle = new TitleClass("JParanoia Community Server", ServerConstants.JPARANOIA_VERSION,
-			false);
+	//private static TitleClass myTitle = new TitleClass("JParanoia Community Server", ServerConstants.JPARANOIA_VERSION,false);
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
 	private static Vector<ServerPlayer> spareNpcs = new Vector<>(10);
@@ -229,7 +228,7 @@ public class JPServer extends JParanoia {
 		setOptions();
 
 		profiler.start("frame init");
-		frame.setTitle(myTitle.get());
+		frame.setTitle(ServerConstants.WELCOME_MESSAGE);
 		frame.setIconImage(getDefaultToolkit()
 				.getImage(lookup().lookupClass().getClassLoader().getResource("graphics/jparanoiaIcon.jpg")));
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -586,18 +585,10 @@ public class JPServer extends JParanoia {
 		connectOPane = new JOptionPane();
 		errorPane = new JOptionPane();
 		myPlayer = players[0];
-		displayWrite(green, "JParanoia Community Server " + ServerConstants.JPARANOIA_VERSION);
-		displayWrite(orange, "      https://github.com/ndo360/JParanoiaRPG/\n");
-		displayWrite(red,
-				"This is an unofficial community edition for JParanoia.\nWe take no credit for the original creation of this program.\nOur only goal is to allow for people to play on the program once again.\n\n");
-		displayWrite(cyan,  "New in this community release:\n\n");
-		displayWrite(white, "- SOUND IS NOW FUNCTIONAL!! MAKE SURE TO UNMUTE PROGRAM.\n");
-		displayWrite(white,	"- Replaced default PreGens, with 'classic' RED CLEARANCE\nPreGens From PARANOIA XP's 'Crash Priority' supplement.\n\n");
-		displayWrite(cyan,  "Previous version's patch notes:\n\n");
-		displayWrite(white, "-ALL https links should work, no more 403 errors.\n");
-		displayWrite(white, "-New text has been added to Combat Mode, this should \nhelp new GMs and Players understand how it works.\n\n");
-		displayWrite(white,	"If you are new to running a JParanoia Server, or find yourself wondering how to do something, ");
-		displayWrite(yellow,"READ THE README.\n");
+		
+		
+		//Display the welcome message and the most recent patch notes!
+		ServerConstants.writeIntroduction();
 
 		profiler.start("log init");
 		serverOptions.setKeepLog((Boolean) prefs.getPref(20));
@@ -1237,17 +1228,6 @@ public class JPServer extends JParanoia {
 		spamString("210" + paramServerPlayer.getID());
 	}
 
-	public static void setTitleMessage(String paramString) {
-		myTitle.setExtra(paramString);
-		frame.setTitle(myTitle.get());
-		spamString("013" + paramString);
-	}
-
-	public static void clearTitleMessage() {
-		myTitle.clearExtra();
-		frame.setTitle(myTitle.get());
-		spamString("013");
-	}
 
 	public static void setAnnouncement() {
 		new JOptionPane();
@@ -1407,3 +1387,21 @@ public class JPServer extends JParanoia {
  * C:\Users\noahc\Desktop\JParanoia(1.31.1)\JParanoia(1.31.1).jar!\jparanoia\
  * server\JPServer.class Java compiler version: 3 (47.0) JD-Core Version: 0.7.1
  */
+
+
+//Methods below this line are in the process of being phased out.
+//-----------------------
+
+
+/*public static void setTitleMessage(String paramString) {
+myTitle.setExtra(paramString);
+frame.setTitle(ServerConstants.WELCOME_MESSAGE);
+spamString("013" + paramString);
+}*/
+
+/*public static void clearTitleMessage() {
+//TODO: Patch
+//myTitle.clearExtra();
+frame.setTitle(ServerConstants.WELCOME_MESSAGE);
+spamString("013");
+}*/
