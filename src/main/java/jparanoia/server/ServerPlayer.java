@@ -21,7 +21,6 @@ import static jparanoia.server.JPServer.absoluteChat;
 import static jparanoia.server.JPServer.absoluteSpam;
 import static jparanoia.server.JPServer.repaintMenus;
 import static jparanoia.server.JPServer.sendCommand;
-import static jparanoia.server.JPServer.spareNpcs;
 import static jparanoia.server.JPServer.stripComments;
 
 import jparanoia.server.constants.ServerConstants;
@@ -74,10 +73,9 @@ public class ServerPlayer extends JPPlayer implements Serializable {
     private ServerPlayerMenu playerMenu;
     private NPCMenu npcMenu;
     private JCheckBox globalExcludeCheckBox;
-    private HashMap<String,Integer> securityClearance = new HashMap<String,Integer>();
-
-
-    public ServerPlayer( int playerNumber, String name, boolean isPlayer, String password, String dataFile ) {
+    private static HashMap<String,Integer> securityClearance = new HashMap<>();
+    
+    static {
         securityClearance.put("IR",0);
         securityClearance.put("R" ,1);
         securityClearance.put("O" ,2);
@@ -86,7 +84,12 @@ public class ServerPlayer extends JPPlayer implements Serializable {
         securityClearance.put("B" ,5);
         securityClearance.put("I" ,6);
         securityClearance.put("V" ,7);
-        securityClearance.put("U" ,8);        
+        securityClearance.put("U" ,8);   
+    }
+
+
+    public ServerPlayer( int playerNumber, String name, boolean isPlayer, String password, String dataFile ) {
+     
         this.PLAYER_NUMBER = playerNumber;
         this.password = password;
         this.IS_PLAYER = isPlayer;
@@ -95,7 +98,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
             this.loggedIn = true;
             this.npcMenu = new NPCMenu( this );
             logger.info( "Generated NPCMenu for " + this.name );
-            spareNpcs.add( this );
+            JPServer.spareNpcs.add( this );
         }
         this.dataFile = dataFile;
         this.characterSheet = new DefaultStyledDocument( new StyleContext() );
@@ -183,24 +186,9 @@ public class ServerPlayer extends JPPlayer implements Serializable {
                 if ( ( this.clearanceInt = evaluateClearance( this.clearance ) ) == -99 ) {
                     errorMessage( "Invalid clearance", "The character sheet " +
                             this.dataFile +
-                            "\n" +
-                            "attempts to grant a player an\n" +
-                            "invalid security clearance \"" +
+                            ServerConstants.INVALID_CLONE_WARNING+
                             this.clearance +
-                            "\".\n" +
-                            "\n" +
-                            "Allowed clearance codes are:\n" +
-                            "(blank) = infrared\n" +
-                            "R = red\n" +
-                            "O = orange\n" +
-                            "Y = yellow\n" +
-                            "G = green\n" +
-                            "B = blue\n" +
-                            "I = indigo\n" +
-                            "V = violet\n" +
-                            "U = ultraviolet\n" +
-                            "\n" +
-                            "Correct the error and relaunch the server." );
+                            ServerConstants.INVALID_CLONE_WARNING_DESCRIPTION);
                     exit( 0 );
                 }
                 this.sector = str.substring( str.lastIndexOf( "-" ) + 1 );
@@ -292,7 +280,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
     }
 
     public String getName() {
-        if ( isAnActualPlayer() && this.PLAYER_NUMBER != 0 ) {
+        if ( this.IS_PLAYER && this.PLAYER_NUMBER != 0 ) {
             if ( this.clearanceInt == 0 ) {
                 return this.name + "-" + this.sector;
             }
@@ -301,57 +289,8 @@ public class ServerPlayer extends JPPlayer implements Serializable {
         return this.name;
     }
 
-    public boolean isAnActualPlayer() {
-        return this.IS_PLAYER;
-    }
-
-    public void setPMPane( PrivateMessagePane paramPrivateMessagePane ) {
-        this.pmPane = paramPrivateMessagePane;
-    }
-
-    public boolean isLoggedIn() {
-        return this.loggedIn;
-    }
-
-    public void setLoggedIn( boolean paramBoolean ) {
-        this.loggedIn = paramBoolean;
-    }
-
-    public Color getChatColor() {
-        return this.chatColor;
-    }
-
-    public void setChatColor( Color paramColor ) {
-        this.chatColor = paramColor;
-    }
-
-    public int getPlayerNumber() {
-        return this.PLAYER_NUMBER;
-    }
-
-    public String getRealName() {
-        return this.realName;
-    }
-
-    public void setRealName( String paramString ) {
-        this.realName = paramString;
-        this.playerMenu.realNameLabel.setText( "    Real Name: " + this.realName );
-    }
-
-    public void setStatusPanel( StatusPanel paramStatusPanel ) {
-        this.statusPanel = paramStatusPanel;
-    }
-
-    public boolean isMuted() {
-        return this.muted;
-    }
-
-    public void setMuted( boolean paramBoolean ) {
-        this.muted = paramBoolean;
-    }
-
     public void kill() {
-        if ( isAnActualPlayer() && !this.isDead ) {
+        if ( this.IS_PLAYER && !this.isDead ) {
             if ( this.cloneNumber < JPServer.serverOptions.getMaxNumClones() || JPServer.serverOptions.isPXPGame() ) {
                 String str1 = this.name;
                 String str2 = deathEuphamism( toString() );
@@ -367,7 +306,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
             JPServer.notifyPlayersOfDeath( this );
             JPServer.spoofComboBox.repaint();
             saveCharsheet( false );
-        } else if ( isAnActualPlayer() && this.isDead ) {
+        } else if ( this.IS_PLAYER && this.isDead ) {
             JPServer.absoluteChat( "The GM has attempted to kill " +
                     this.name +
                     " one more time. This is, of course, impossible." );
@@ -378,7 +317,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
     }
 
     public void unkill() {
-        if ( isAnActualPlayer() ) {
+        if ( this.IS_PLAYER ) {
             if ( this.isDead ) {
                 this.isDead = false;
                 JPServer.absoluteChat( toString() + " has been refunded a clone due to a clerical error." );
@@ -538,7 +477,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
     }
 
     public int evaluateClearance(String clearance){
-        int clearanceInt = securityClearance.get(clearance);
+        int clearanceInt = ServerPlayer.securityClearance.get(clearance);
         if(this.playerMenu != null) {
         	this.getPlayerMenu().playerClearanceMenu.securityClearancesByRank[clearanceInt].setSelected(true);
         }
@@ -700,7 +639,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
     }
 
     public String toString() {
-        if ( isAnActualPlayer() && this.PLAYER_NUMBER != 0 ) {
+        if ( this.IS_PLAYER && this.PLAYER_NUMBER != 0 ) {
             return getName() + "-" + this.cloneNumber;
         }
         return getName();
@@ -720,6 +659,16 @@ public class ServerPlayer extends JPPlayer implements Serializable {
             JPServer.sendCommand( "010" + getID() + "n" + "n" + str );
         }
     }
+
+	@Override
+	public Color getChatColor() {
+		return this.chatColor;
+	}
+    
+    
+    
+    
+    
 }
 
 
@@ -727,6 +676,61 @@ public class ServerPlayer extends JPPlayer implements Serializable {
  * Java compiler version: 2 (46.0)
  * JD-Core Version:       0.7.1
  */
+
+// Items below this line are in the process of being refactored.
+//-----------------------------
+
+
+/*
+ *     public boolean isAnActualPlayer() {
+        return this.IS_PLAYER;
+    }
+
+    public void setPMPane( PrivateMessagePane paramPrivateMessagePane ) {
+        this.pmPane = paramPrivateMessagePane;
+    }
+
+    public boolean isLoggedIn() {
+        return this.loggedIn;
+    }
+
+    public void setLoggedIn( boolean paramBoolean ) {
+        this.loggedIn = paramBoolean;
+    }
+
+    public Color getChatColor() {
+        return this.chatColor;
+    }
+
+    public void setChatColor( Color paramColor ) {
+        this.chatColor = paramColor;
+    }
+
+    public int getPlayerNumber() {
+        return this.PLAYER_NUMBER;
+    }
+
+    public String getRealName() {
+        return this.realName;
+    }
+
+    public void setRealName( String paramString ) {
+        this.realName = paramString;
+        this.playerMenu.realNameLabel.setText( "    Real Name: " + this.realName );
+    }
+
+    public void setStatusPanel( StatusPanel paramStatusPanel ) {
+        this.statusPanel = paramStatusPanel;
+    }
+
+    public boolean isMuted() {
+        return this.muted;
+    }
+
+    public void setMuted( boolean paramBoolean ) {
+        this.muted = paramBoolean;
+    }
+ * */
 
 
 /*        logger.info( "Sending " + getName() + " their last saved char sheet..." );

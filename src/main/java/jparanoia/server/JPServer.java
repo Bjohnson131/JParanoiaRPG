@@ -119,8 +119,10 @@ public class JPServer extends JParanoia {
 	private static Integer mainFontSize = 99;
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
-	private static Vector<ServerPlayer> spareNpcs = new Vector<>(10);
-	private static SimpleAttributeSet charsheetAttributes;
+	//SERVER_PLAYER
+	public static Vector<ServerPlayer> spareNpcs = new Vector<>(10);
+	public static SimpleAttributeSet charsheetAttributes;
+	
 	private static ServerPlayer[] troubleshooters;
 	private static ServerPlayer playerToSpoof;
 	private static ServerPlayer pmTargetPlayer;

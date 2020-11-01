@@ -74,6 +74,22 @@ public final class ServerConstants {
 			"has cashed in his credits."
 	};
 	
+	public static final String INVALID_CLONE_WARNING_DESCRIPTION = 
+			"\".\n\nAllowed clearance codes are:\n" +
+            "(blank) = infrared\n" +
+            "R = red\n" +
+            "O = orange\n" +
+            "Y = yellow\n" +
+            "G = green\n" +
+            "B = blue\n" +
+            "I = indigo\n" +
+            "V = violet\n" +
+            "U = ultraviolet\n" +
+            "\n" +
+            "Correct the error and relaunch the server.";
+	public static final String INVALID_CLONE_WARNING = "";
+	
+	
 	
 	
 	
