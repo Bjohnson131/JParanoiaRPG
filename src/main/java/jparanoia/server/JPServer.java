@@ -100,30 +100,44 @@ import jparanoia.shared.GameLogger;
 import jparanoia.shared.GameRegistrar;
 import jparanoia.shared.JParanoia;
 
-public class JPServer extends JParanoia {
+public class JPServer.serverOptions extends JParanoia {
 	private static final Logger logger = getLogger(MethodHandles.lookup().lookupClass());
 	public static final ServerOptions serverOptions = new ServerOptions();
 
 	public static Random rand = new Random();
-	private static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>();
+	//ServerChatThread
+	//public static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>();
+	
 	private static PrintWriter someWriter;
 	private static ServerSocketThread servSocketThread;
 	private static ServerChatThread thisThread;
-	private static ServerPlayer[] players;
+	//combatFrame
+	public static ServerPlayer[] players;
 	public static ServerPlayer myPlayer;
-	private static int numberOfPlayers = 0;
-	private static int numberOfPCs = 0;
-	private static int numberOfConnectedClients = 0;
-	private static int numberOfConnectedObservers = 0;
+	
+	//CombatFrame
+	public static int numberOfPCs = 0;
+	
+	//ServerChatThread
+	public static int numberOfConnectedClients = 0;
+	public static int numberOfConnectedObservers = 0;
+	public static ThreadGroup chatThreadGroup = new ThreadGroup( "my group of chat threads" );
+	public static JCheckBoxMenuItem hearObserversMenuItem;
+	public static int numberOfPlayers = 0;
+	
 	private static int randInt = rand.nextInt(1000);
-	private static Integer mainFontSize = 99;
+	//FontMenu
+	public static Integer mainFontSize = 99;
+	
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
 	//SERVER_PLAYER
 	public static Vector<ServerPlayer> spareNpcs = new Vector<>(10);
 	public static SimpleAttributeSet charsheetAttributes;
 	
-	private static ServerPlayer[] troubleshooters;
+	//charsheet panel
+	public static ServerPlayer[] troubleshooters;
+	
 	private static ServerPlayer playerToSpoof;
 	private static ServerPlayer pmTargetPlayer;
 	private static JScrollPane inputScrollPane;
@@ -136,7 +150,9 @@ public class JPServer extends JParanoia {
 	private static JPanel spoofPanel;
 	private static JPanel spoofAndFreezePanel;
 	private static JMenuBar menuBar;
-	private static ServerOptionsMenu optionsMenu;
+	//Private Message Pane
+	public static ServerOptionsMenu optionsMenu;
+	
 	private static JMenu serverMenu;
 	private static JMenu fontMenu;
 	private static JMenu playerMenu;
@@ -144,25 +160,32 @@ public class JPServer extends JParanoia {
 	private static JMenu globalPMMenu;
 	private static JMenu sendImageMenu;
 	private static JMenu observersMenu;
-	private static JMenuItem startServerMenuItem;
-	private static JMenuItem stopServerMenuItem;
+	//Server Socked Thread
+	public static JMenuItem startServerMenuItem;
+	public static JMenuItem stopServerMenuItem;
+	
 	private static JMenuItem sendGlobalPMMenuItem;
 	private static JMenuItem setGameDescriptionMenuItem;
 	private static JMenuItem showObserversListMenuItem;
 	private static JMenuItem announceObserversMenuItem;
 	private static JCheckBoxMenuItem registerGameMenuItem;
-	private static JCheckBoxMenuItem hearObserversMenuItem;
 	private static JCheckBox spoofCheckBox;
 	public static JComboBox<? extends ServerPlayer> spoofComboBox;
-	private static JButton freezeButton;
-	private static JButton combatButton;
+	//CombatFrame
+	public static JButton freezeButton;
+	public static JButton combatButton;
+	
 	private static JLabel ipLabel;
 	private static JScrollPane scrollPane;
 	private static JSplitPane splitPane;
 	public static JTextArea inputLine;
 	public static CombatFrame combatFrame;
-	private static CharsheetPanel charsheetPanel;
-	private static ImageDataParser idp;
+	//PrivateMessagePane
+	public static CharsheetPanel charsheetPanel;
+	
+	//ServerImageMenu
+	public static ImageDataParser idp;
+	
 	private static SimpleAttributeSet systemTextAttributes = new SimpleAttributeSet();
 	private static Color[] brightColors;
 	private static Color[] darkColors = { 
@@ -180,7 +203,9 @@ public class JPServer extends JParanoia {
 	private static Date timeStamp;
 	private static String gameDescription = defaultGameDescription;
 	private static String currentPlayerID = "00";
-	private static String currentColorScheme = "";
+	//PrivateMessagePane
+	public static String currentColorScheme = "";
+	
 	private static String newColorScheme = WHITE_ON_BLACK;
 	private static InetAddress localIP = null;
 	private static PrivateMessagePane[] PMPane;
@@ -223,7 +248,7 @@ public class JPServer extends JParanoia {
 		idp.parseImageURLs("imageData.txt");
 		numberOfPlayers = players.length;
 		for (final ServerPlayer player : players) {
-			if (player.isAnActualPlayer()) {
+			if (player.IS_PLAYER) {
 				numberOfPCs += 1;
 			}
 		}
@@ -242,7 +267,7 @@ public class JPServer extends JParanoia {
 				}
 			}
 		}
-		players[0].setLoggedIn(true);
+		players[0].loggedIn = true;
 		myPlayer = players[0];
 
 		profiler.start("further frame init");
@@ -430,12 +455,12 @@ public class JPServer extends JParanoia {
 		menuBar.add(optionsMenu);
 		playerMenu = new JMenu("Player");
 		for (final ServerPlayer troubleshooter : troubleshooters) {
-			playerMenu.add(troubleshooter.getPlayerMenu());
+			playerMenu.add(troubleshooter.playerMenu);
 		}
 		menuBar.add(playerMenu);
 		npcMenu = new JMenu("Spare NPCs");
 		for (ServerPlayer spareNpc : spareNpcs) {
-			npcMenu.add(spareNpc.getNpcMenu());
+			npcMenu.add(spareNpc.npcMenu);
 		}
 		menuBar.add(npcMenu);
 		globalPMMenu = new JMenu("Global PM");
@@ -665,12 +690,12 @@ public class JPServer extends JParanoia {
 		switch (currentColorScheme) {
 		case WHITE_ON_BLACK:
 			for (i = 0; i < numberOfPlayers; i++) {
-				players[i].setChatColor(brightColors[i]);
+				players[i].chatColor = brightColors[i];
 			}
 			break;
 		case BLACK_ON_WHITE:
 			for (i = 0; i < numberOfPlayers; i++) {
-				players[i].setChatColor(darkColors[i]);
+				players[i].chatColor = darkColors[i];
 			}
 			break;
 		default:
@@ -681,10 +706,10 @@ public class JPServer extends JParanoia {
 
 	public static void playerHasJoined(int paramInt) {
 		ServerPlayer localServerPlayer = players[paramInt];
-		localServerPlayer.setLoggedIn(true);
+		localServerPlayer.loggedIn = true;
 		localServerPlayer.pmPane.enableInput();
 		absoluteChat(
-				"--- " + localServerPlayer.toString() + " (" + localServerPlayer.getRealName() + ") has joined ---");
+				"--- " + localServerPlayer.toString() + " (" + localServerPlayer.realName + ") has joined ---");
 		if (serverOptions.isShowTimeStamps()) {
 			displayTimeStamp();
 		}
@@ -722,14 +747,14 @@ public class JPServer extends JParanoia {
 
 	public static void playerHasLeft(int paramInt) {
 		ServerPlayer localServerPlayer = players[paramInt];
-		localServerPlayer.setLoggedIn(false);
+		localServerPlayer.loggedIn = false;
 		localServerPlayer.pmPane.disableInput();
-		absoluteChat("--- " + localServerPlayer.toString() + " (" + localServerPlayer.getRealName() + ") has left ---");
+		absoluteChat("--- " + localServerPlayer.toString() + " (" + localServerPlayer.realName + ") has left ---");
 		if (serverOptions.isShowTimeStamps()) {
 			displayTimeStamp();
 		}
 		localServerPlayer.statusPanel.statusLoggedIn(false);
-		localServerPlayer.setRealName("???");
+		localServerPlayer.realName = "???";
 		if (soundIsOn && soundMenu.joinLeaveMenuItem.isSelected()) {
 			soundPlayer.play(PLAYER_LEAVE);
 		}
@@ -1096,7 +1121,7 @@ public class JPServer extends JParanoia {
 				JOptionPane.PLAIN_MESSAGE, null, null, null);
 		if (str != null && !"".equals(str)) {
 			for (int i = 1; i < numberOfPCs; i++) {
-				if (players[i].isLoggedIn()) {
+				if (players[i].loggedIn) {
 					players[i].specificSend("200" + players[i].getID() + myPlayer.getID() + str);
 					PMPane[i].addMyMessage(str);
 				}

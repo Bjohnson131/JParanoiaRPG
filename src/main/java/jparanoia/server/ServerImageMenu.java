@@ -53,9 +53,9 @@ public class ServerImageMenu extends JMenu {
         }
         JPServer.sendCommand( "404" + imgDescription + JParanoia.IMG_DELIMITER + imgLink );
         JParanoia.displayImage( imgDescription + JParanoia.IMG_DELIMITER + imgLink );
-        if ( JPServer.keepLog ) {
+        if ( JPServer.serverOptions.isKeepLog() ) {
             String logEntry;
-            if ( JPServer.htmlLog ) {
+            if ( JPServer.serverOptions.isHtmlLog() ) {
                 logEntry = MessageFormat.format( "IMAGE: \"{0}\" " +
                                 "URL: <a href=\"{1}\">{2}</a><br/>\n<img src=\"{3}\"><br/>",
                                 imgDescription, imgLink, imgLink, imgLink );

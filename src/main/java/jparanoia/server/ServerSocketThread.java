@@ -6,12 +6,7 @@ import java.lang.invoke.MethodHandles;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import static jparanoia.server.JPServer.absoluteChat;
-import static jparanoia.server.JPServer.displayTimeStamp;
-import static jparanoia.server.JPServer.serverRunning;
-import static jparanoia.server.JPServer.showTimeStamps;
-import static jparanoia.server.JPServer.startServerMenuItem;
-import static jparanoia.server.JPServer.stopServerMenuItem;
+import jparanoia.server.JPServer;
 import org.slf4j.Logger;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -24,22 +19,22 @@ public class ServerSocketThread extends Thread {
     Socket someSock;
 
     public void run() {
-        stopServerMenuItem.setEnabled( true );
-        startServerMenuItem.setEnabled( false );
+    	JPServer.stopServerMenuItem.setEnabled( true );
+    	JPServer.startServerMenuItem.setEnabled( false );
         try {
             this.serverSocket = new ServerSocket( 11777 );
         } catch ( IOException localIOException1 ) {
             logger.info( "Error starting server: could not listen on port: 11777" );
-            absoluteChat( "Error starting server: could not listen on port: 11777" );
-            absoluteChat( "Likely cause: another instance of server is currently running." );
+            JPServer.absoluteChat( "Error starting server: could not listen on port: 11777" );
+            JPServer.absoluteChat( "Likely cause: another instance of server is currently running." );
             return;
         }
         logger.info( "ServerSocket established and listening on port 11777" );
-        absoluteChat( "\nServer started and listening." );
-        if ( showTimeStamps ) {
-            displayTimeStamp();
+        JPServer.absoluteChat( "\nServer started and listening." );
+        if ( JPServer.serverOptions.isShowTimeStamps() ) {
+        	JPServer.displayTimeStamp();
         }
-        serverRunning = true;
+        JPServer.serverOptions.setServerRunning(true);
         try {
             while ( this.listening ) {
                 this.someSock = this.serverSocket.accept();
@@ -48,21 +43,21 @@ public class ServerSocketThread extends Thread {
             }
         } catch ( SocketException localSocketException ) {
             if ( this.listening ) {
-                absoluteChat( "ServerSocket closed by outside force..." );
+            	JPServer.absoluteChat( "ServerSocket closed by outside force..." );
             } else {
-                absoluteChat( "ServerSocket closed by user (that's you)." );
+            	JPServer.absoluteChat( "ServerSocket closed by user (that's you)." );
             }
         } catch ( IOException localIOException2 ) {
             err.println( "Error: unhandled I/O exception" );
             localIOException2.printStackTrace();
         }
-        stopServerMenuItem.setEnabled( false );
-        startServerMenuItem.setEnabled( true );
+        JPServer.stopServerMenuItem.setEnabled( false );
+        JPServer.startServerMenuItem.setEnabled( true );
         logger.info( "ServerSocket closed, no longer listening on 11777" );
-        absoluteChat( "Server no longer listening for new connections." );
-        if ( showTimeStamps ) {
-            displayTimeStamp();
-        }
+        JPServer.absoluteChat( "Server no longer listening for new connections." );
+        /*if ( JPServer.showTimeStamps ) {
+        	JPServer.displayTimeStamp();
+        }*/
     }
 }
 

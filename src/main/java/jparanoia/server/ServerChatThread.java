@@ -15,7 +15,6 @@ import static jparanoia.server.JPServer.chatThreads;
 import static jparanoia.server.JPServer.combatButton;
 import static jparanoia.server.JPServer.combatFrame;
 import static jparanoia.server.JPServer.generalChat;
-import static jparanoia.server.JPServer.hearObserversMenuItem;
 import static jparanoia.server.JPServer.numberOfConnectedClients;
 import static jparanoia.server.JPServer.numberOfConnectedObservers;
 import static jparanoia.server.JPServer.observerChat;
@@ -58,7 +57,7 @@ class ServerChatThread extends Thread {
     public ServerChatThread( Socket paramSocket ) {
         super( JPServer.chatThreadGroup, "new JParanoia Thread" );
         this.socket = paramSocket;
-        this.thisPlayer.setLoggedIn( false );
+        this.thisPlayer.loggedIn = false;
     }
 
     public void run() {
@@ -84,7 +83,7 @@ class ServerChatThread extends Thread {
                             break;
                         case 99:
                             sendCommand( str );
-                            if ( hearObserversMenuItem.isSelected() ) {
+                            if ( JPServer.hearObserversMenuItem.isSelected() ) {
                                 observerChat( str.substring( 3 ) );
                             }
                             break;
@@ -193,11 +192,11 @@ class ServerChatThread extends Thread {
             this.out.println( "900 Welcome to JParanoia" );
             this.out.println( "900----------------------" );
             for ( int j = 0; j < JPServer.numberOfPlayers; j++ ) {
-                if ( JPServer.players[j].isAnActualPlayer() && !JPServer.players[j].isLoggedIn() ) {
+                if ( JPServer.players[j].IS_PLAYER && !JPServer.players[j].loggedIn ) {
                     this.out.println( "900" + j + "  " + JPServer.players[j].getName() );
                 }
             }
-            if ( JPServer.allowObservers ) {
+            if ( JPServer.serverOptions.isAllowObservers() ) {
                 this.out.println( "90099 observe" );
             }
             while ( !this.acceptedLogin ) {
@@ -212,7 +211,7 @@ class ServerChatThread extends Thread {
                     i = Integer.parseInt( str2.substring( 3 ) );
                     if ( i < JPServer.numberOfPCs ) {
                         logger.info( "New user attempting to connect as " + players[i].getName() );
-                        if ( players[i].isLoggedIn() ) {
+                        if ( players[i].loggedIn ) {
                             this.out.println( "910 Invalid entry. That player is already logged in. (Nice try.)" );
                         } else {
                             this.out.println( "900 Enter your password." );
@@ -223,7 +222,7 @@ class ServerChatThread extends Thread {
                             }
                         }
                     } else if ( i == 99 ) {
-                        if ( JPServer.allowObservers ) {
+                        if ( JPServer.serverOptions.isAllowObservers() ) {
                             this.out.println( "040" );
                             this.out.println( "900 Entering as an observer..." );
                             this.observer = true;
@@ -243,7 +242,7 @@ class ServerChatThread extends Thread {
                 this.thisPlayer = JPServer.players[this.playerID];
                 this.thisPlayer.setThread( this );
                 this.out.println( "041" );
-                this.thisPlayer.setRealName( this.in.readLine() );
+                this.thisPlayer.realName =  this.in.readLine();
                 this.out.println( "900 Password accepted. Entering server..." );
             }
             this.out.println( "199-----------------------------------------" );
@@ -256,10 +255,10 @@ class ServerChatThread extends Thread {
                     }
                     String str3 = "n";
                     String str4 = "n";
-                    if ( JPServer.players[k].isAnActualPlayer() ) {
+                    if ( JPServer.players[k].IS_PLAYER ) {
                         str3 = "p";
                     }
-                    if ( JPServer.players[k].isLoggedIn() ) {
+                    if ( JPServer.players[k].loggedIn ) {
                         str4 = "y";
                     }
                     this.out.println( "010" + str5 + str3 + str4 + JPServer.players[k].toString() );
@@ -270,10 +269,10 @@ class ServerChatThread extends Thread {
             } else {
                 this.out.println( "906" + i );
                 setName( this.thisPlayer.getID() );
-                if ( JPServer.frozen ) {
+                if ( JPServer.serverOptions.isFrozen() ) {
                     this.out.println( "052" );
                 }
-                if ( this.thisPlayer.isMuted() ) {
+                if ( this.thisPlayer.muted ) {
                     this.out.println( "051" + this.thisPlayer.getID() );
                 }
             }
@@ -282,9 +281,9 @@ class ServerChatThread extends Thread {
             } else {
                 this.out.println( "098" );
             }
-            this.out.println( "070" + JPServer.computerFontIncrease );
-            this.out.println( "074" + JPServer.maxNumClones );
-            this.out.println( "013" + JPServer.titleMessage );
+            this.out.println( "070" + JPServer.serverOptions.getComputerFontIncrease() );
+            this.out.println( "074" + JPServer.serverOptions.getMaxNumClones() );
+            this.out.println( "013" + ServerConstants.WELCOME_MESSAGE );
             if ( JPServer.optionsMenu.useAnnouncementMenuItem.isSelected() ) {
                 this.out.println( JPServer.getAnnouncement() );
             }
@@ -388,7 +387,7 @@ class ServerChatThread extends Thread {
                 observerHasLeft( this.obsName );
             }
         }
-        if ( !this.thisPlayer.isLoggedIn() ) {
+        if ( !this.thisPlayer.loggedIn ) {
             logger.info( "Unknown user disconnected. (Not signed in.)" );
         } else {
             JPServer.sendCommand( "012" + this.playerID );
@@ -396,10 +395,10 @@ class ServerChatThread extends Thread {
             this.thisPlayer.setThread( null );
         }
         synchronized ( JPServer.chatThreads ) {
-            if ( this.observer || this.thisPlayer.isLoggedIn() ) {
+            if ( this.observer || this.thisPlayer.loggedIn ) {
                 chatThreads.remove( this.threadNumber );
             }
-            if ( !this.observer && this.thisPlayer.isLoggedIn() ) {
+            if ( !this.observer && this.thisPlayer.loggedIn ) {
                 playerHasLeft( this.playerID );
             }
             numberOfConnectedClients = chatThreads.size();

@@ -7,6 +7,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
 import static jparanoia.server.JPServer.keepLog;
+
+import jparanoia.server.constants.ServerConstants;
 import jparanoia.shared.GameLogger;
 import static jparanoia.shared.JParanoia.autoScroll;
 import static jparanoia.shared.JParanoia.log;
@@ -76,13 +78,13 @@ public class ServerOptionsMenu extends JMenu {
         this.showTimeStampsMenuItem = new JCheckBoxMenuItem( "Show Timestamps" );
         this.showTimeStampsMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 24 ) );
         this.showTimeStampsMenuItem.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.showTimeStamps = !JPServer.showTimeStamps;
+            JPServer.serverOptions.setShowTimeStamps(!JPServer.serverOptions.isShowTimeStamps());
         } );
         this.bigComputerFontMenuItem = new JCheckBoxMenuItem( "Show Big Computer Font" );
         this.bigComputerFontMenuItem.setToolTipText( "<HTML>When disabled, players see The Computer's font<BR>in the increased size but you do not.</HTML>" );
         this.bigComputerFontMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 25 ) );
         this.bigComputerFontMenuItem.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.bigComputerFont = !JPServer.bigComputerFont;
+            JPServer.serverOptions.setBigComputerFont(!JPServer.serverOptions.isBigComputerFont();
         } );
         this.computerAllCapsMenuItem = new JCheckBoxMenuItem( "Computer speech in CAPS" );
         this.computerAllCapsMenuItem.setToolTipText( "Show The Computer's speech in ALL CAPS." );
@@ -161,7 +163,7 @@ public class ServerOptionsMenu extends JMenu {
         this.computerFontIncreaseMenu.add( this.cpuIncrease14 );
         this.computerFontIncreaseMenu.add( this.cpuIncrease16 );
         this.computerFontIncreaseMenu.add( this.cpuIncrease18 );
-        switch ( JPServer.computerFontIncrease ) {
+        switch ( JPServer.serverOptions.getComputerFontIncrease() ) {
             case 0:
                 this.cpuIncrease0.setSelected( true );
                 break;
@@ -195,13 +197,7 @@ public class ServerOptionsMenu extends JMenu {
         }
         this.titleMessageMenuItem = new JMenuItem( "Set Title Message..." );
         this.titleMessageMenuItem.setToolTipText( "<HTML>Displays a message in the title bar<BR>of everyone's main window.</HTML>" );
-        this.titleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> {
-            new JOptionPane();
-            JPServer.titleMessage = (String) JOptionPane.showInputDialog( null, "Enter a new title bar message:", "Set Title Message", JOptionPane.PLAIN_MESSAGE, null, null, "" );
-            if ( JPServer.titleMessage != null ) {
-                JPServer.setTitleMessage( JPServer.titleMessage );
-            }
-        } );
+
         this.clearTitleMessageMenuItem = new JMenuItem( "Clear Title Message" );
         this.clearTitleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.clearTitleMessage() );
         this.useAnnouncementMenuItem = new JCheckBoxMenuItem( "Use Announcement" );
@@ -212,8 +208,8 @@ public class ServerOptionsMenu extends JMenu {
         this.clearAnnouncementMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.clearAnnouncement() );
         this.allowGMEmotesMenuItem = new JCheckBoxMenuItem( "Allow GM Emotes" );
         this.allowGMEmotesMenuItem.setToolTipText( "<HTML> When disabled, if the you attempt to use speech <BR> or perform an action when you are not spoofing <BR> a character, you will receive a warning and the <BR> text will not be sent.</HTML>" );
-        this.allowGMEmotesMenuItem.setSelected( JPServer.allowGMEmotes );
-        this.allowGMEmotesMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.allowGMEmotes = !JPServer.allowGMEmotes);
+        this.allowGMEmotesMenuItem.setSelected( JPServer.serverOptions.isAllowGMEmotes() );
+        this.allowGMEmotesMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.serverOptions.setAllowGMEmotes(!JPServer.serverOptions.isAllowGMEmotes()));
         this.singleUseSpoofMenuItem = new JCheckBoxMenuItem( "Single Use Spoofing" );
         this.singleUseSpoofMenuItem.setToolTipText( "<HTML> When checked, the Spoof checkbox will <BR>automatically deselect itself when you send a <BR>spoofed line.</HTML>" );
         this.singleUseSpoofMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 36 ) );
@@ -250,3 +246,17 @@ public class ServerOptionsMenu extends JMenu {
  * Java compiler version: 2 (46.0)
  * JD-Core Version:       0.7.1
  */
+
+
+/**
+ * Code below this line is in the process of being phased out.
+ * */
+//--------------------
+
+/*this.titleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> {
+new JOptionPane();
+ServerConstants.WELCOME_MESSAGE = (String) JOptionPane.showInputDialog( null, "Enter a new title bar message:", "Set Title Message", JOptionPane.PLAIN_MESSAGE, null, null, "" );
+if ( JPServer.titleMessage != null ) {
+    JPServer.setTitleMessage( JPServer.titleMessage );
+}
+} );*/

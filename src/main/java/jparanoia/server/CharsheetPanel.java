@@ -43,13 +43,12 @@ public class CharsheetPanel extends JPanel {
         this.saveButton = new JButton( "Save / Send" );
         this.saveButton.setMaximumSize( new Dimension( 65, 22 ) );
         this.saveButton.addActionListener( paramAnonymousActionEvent -> {
-            CharsheetPanel.this.selectedPlayer.saveCharsheet( CharsheetPanel.this.selectedPlayer.isLoggedIn() );
+            CharsheetPanel.this.selectedPlayer.saveCharsheet( CharsheetPanel.this.selectedPlayer.loggedIn );
         } );
         this.playerComboBox = new JComboBox( JPServer.troubleshooters );
         this.playerComboBox.addActionListener( paramAnonymousActionEvent -> {
             CharsheetPanel.this.selectedPlayer = (ServerPlayer) CharsheetPanel.this.playerComboBox.getSelectedItem();
             CharsheetPanel.this.theFile = CharsheetPanel.this.selectedPlayer.getCharsheet();
-            CharsheetPanel.this.displayArea.setDocument( CharsheetPanel.this.theFile );
         } );
         this.selectedPlayer = (ServerPlayer) this.playerComboBox.getSelectedItem();
         this.theFile = this.selectedPlayer.getCharsheet();

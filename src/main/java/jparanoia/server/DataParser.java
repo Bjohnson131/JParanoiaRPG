@@ -51,7 +51,7 @@ public class DataParser {
                         this.somePlayer = new ServerPlayer( this.playerNumber, this.playerName, this.playerIsPlayer, this.playerPassword,
                                 DATA_FOLDER +
                                         this.playerDataFileName );
-                        if ( this.somePlayer.isAnActualPlayer() ) {
+                        if ( this.somePlayer.IS_PLAYER ) {
                             this.somePlayer.readCharacterSheetFile();
                         }
                         this.newPlayers.addElement( this.somePlayer );

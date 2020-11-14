@@ -8,7 +8,7 @@ public class PMAndStatusPanel extends JPanel {
         setLayout( new BoxLayout( this, BoxLayout.X_AXIS ) );
         paramStatusPanel.setPreferredSize( new Dimension( 35, 70 ) );
         paramStatusPanel.setMinimumSize( new Dimension( 35, 70 ) );
-        if ( JPServer.isPXPGame ) {
+        if ( JPServer.serverOptions.isPXPGame() ) {
             SpinnerPanel localSpinnerPanel = new SpinnerPanel();
             add( localSpinnerPanel );
         }

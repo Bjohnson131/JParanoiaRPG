@@ -175,12 +175,12 @@ public class FontMenu extends JMenu {
         this.fontBoldMenuItem = new JCheckBoxMenuItem( "Bold" );
         this.fontBoldMenuItem.setSelected( JPServer.prefs.getPref( 17 ).equals( Boolean.TRUE ) );
         this.fontBoldMenuItem.addActionListener( paramAnonymousActionEvent -> {
-            if ( JPServer.fontIsBold ) {
+            if ( JPServer.serverOptions.isFontIsBold() ) {
                 JPServer.textAttributes.addAttribute( StyleConstants.FontConstants.Bold, Boolean.FALSE );
-                JPServer.fontIsBold = false;
-            } else if ( !JPServer.fontIsBold ) {
+                JPServer.serverOptions.setFontIsBold(false);
+            } else if ( !JPServer.serverOptions.isFontIsBold() ) {
                 JPServer.textAttributes.addAttribute( StyleConstants.FontConstants.Bold, Boolean.TRUE );
-                JPServer.fontIsBold = true;
+                JPServer.serverOptions.setFontIsBold(true);
             }
         } );
         addSeparator();

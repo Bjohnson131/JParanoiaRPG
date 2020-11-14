@@ -89,7 +89,7 @@ public class CombatFrame extends JFrame {
         this.debugButtonString += "Constructing playerButtons...\n";
         this.debugButtonString = this.debugButtonString + "   JPServer.numberOfPCs == " + JPServer.numberOfPCs + "\n";
         for ( int i = 1; i < JPServer.numberOfPCs; i++ ) {
-            if ( JPServer.players[i].isLoggedIn() ) {
+            if ( JPServer.players[i].loggedIn ) {
                 this.playerButtons[i - 1] = new CombatButton( JPServer.players[i] );
                 this.buttonPanel.add( this.playerButtons[i - 1], "Center" );
                 this.playerButtons[i - 1].addActionListener( this.myCombatListener );
@@ -251,7 +251,7 @@ public class CombatFrame extends JFrame {
         sendCommand( "199(GM aborted combat)" );
         absoluteChat( "(GM aborted combat)" );
         for ( final ServerPlayer troubleshooter : troubleshooters ) {
-            if ( troubleshooter.isLoggedIn() ) {
+            if ( troubleshooter.loggedIn ) {
                 troubleshooter.statusPanel.freeze();
             }
         }

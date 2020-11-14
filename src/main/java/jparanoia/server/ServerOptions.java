@@ -19,6 +19,7 @@ public class ServerOptions {
 	private boolean clobberAqua;
 	private boolean showTimeStamps = true;
 	private boolean gmNameNag;
+	private boolean quickNamesToggle = false;
 	private int computerFontIncrease;
 	private int maxNumClones = 5;
 
@@ -177,6 +178,14 @@ public class ServerOptions {
 
 	public void setComputerFontIncrease(int computerFontIncrease) {
 		this.computerFontIncrease = computerFontIncrease;
+	}
+
+	public boolean isQuickNamesToggle() {
+		return quickNamesToggle;
+	}
+
+	public void setQuickNamesToggle(boolean quickNamesToggle) {
+		this.quickNamesToggle = quickNamesToggle;
 	}
 
 }

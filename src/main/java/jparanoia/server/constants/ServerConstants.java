@@ -14,6 +14,10 @@ import java.util.regex.Pattern;
 import jparanoia.shared.JPVersionNumber;
 import jparanoia.shared.JParanoia;
 
+/* This class holds many of the strings that are in the game.
+ * Eventually all of these strings should be dynamically loaded
+ * into memory at runtime via a "language pack".
+ * */
 public final class ServerConstants {
 	
 	public static final String MY_PLAYER_ID = "00";
@@ -38,6 +42,15 @@ public final class ServerConstants {
 	//Window and display constants
 	public static final int IDEAL_WIDTH = 770;
 	public static final int IDEAL_HEIGHT = 540;
+
+	//General messages for various purposes
+	public static final String KICKED_BY_SERVER_MESSAGE = "( * Kicked by server * )";
+	public static final String DUMMY_NPC_NAME = "spareNPC";
+	public static final String GM_FAIL_PLAYER_KILL_ATTEMPT = "The GM has attempted to kill ";
+	public static final String PLAYER_TURN_SKIPPED = " waived their right to a combat turn. (Not too bright)";
+	public static final String PLAYER_DEAD_PREFIX = "(dead)";
+	public static final String PLAYER_CONNECTION_ATTEMPT_MESSAGE = " has attempted to login!";
+	public static final String PLAYER_DEATH_NO_CLONES = " has died and has no clones left! Oh, the humanity!!";
 	
 	//Constants related to the warning that the server is not on the same local IP as the clients
 	public static final String WARN_BEHIND_ROUTER = "Behind a router";
@@ -99,7 +112,8 @@ public final class ServerConstants {
 	public static final String INVALID_CLEARANCE_INVALID = " is invalid. \n" ;
 	
 	
-	/**/
+	/*Errors related to the player entering 'GM' as a name.
+	 * */
 	public static final String PLAYER_NAME_IS_GM_WARNING_TITLE = "Boring GM Name...";
 	public static final String PLAYER_NAME_IS_GM_WARNING = "Your name, as defined in your own charsheet file, ";
 	public static final String PLAYER_NAME_IS_GM_WARNING_DESCRIPTION = "\n" +
@@ -111,6 +125,17 @@ public final class ServerConstants {
             "(You can click Cancel to keep \"GM\" if you so choose.\n" +
             "To permanently surpress this notice, set bGmNameNag=false\n" +
             "in your jpConfig.ini file.)";
+	
+	/*Errors related to an incorrect name format.
+	 * */
+	public static final String PLAYER_NAME_ERROR_DESCRIPTION = 
+            ".\n\n" +
+            "Player names must consist of a first name,\n" +
+            "a clearance initial, and a sector. (Clearance\n" +
+            "initial may be omitted for infrared players.)\n" +
+            "\n" +
+            "Correct the error and relaunch the server.";
+	
 	
 	
 	private ServerConstants() {

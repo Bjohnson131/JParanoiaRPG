@@ -40,7 +40,7 @@ public class StatusPanel extends JPanel implements Serializable {
 	public StatusPanel(ServerPlayer paramServerPlayer) {
 		this.myTimerListener = new TimerListener(this);
 		this.player = paramServerPlayer;
-		this.player.setStatusPanel(this);
+		this.player.statusPanel = this;
 		this.newMessageAnimationTimer.setInitialDelay(this.timerInterval);
 		this.statusButton = new JButton(this.notConnectedIcon);
 		this.statusButton.setEnabled(false);
@@ -51,9 +51,9 @@ public class StatusPanel extends JPanel implements Serializable {
 		this.statusButton.setMinimumSize(new Dimension(31, 30));
 		this.statusButton.setSelected(false);
 		this.statusButton.addActionListener(paramAnonymousActionEvent -> {
-			if (StatusPanel.this.player.isMuted()) {
+			if (StatusPanel.this.player.muted) {
 				JPServer.unmute(StatusPanel.this.player.getID());
-				StatusPanel.this.player.setMuted(false);
+				StatusPanel.this.player.muted = false;
 				if (!JPServer.serverOptions.isFrozen()) {
 					StatusPanel.this.statusButton.setIcon(StatusPanel.this.connectedIcon);
 				} else {
@@ -61,7 +61,7 @@ public class StatusPanel extends JPanel implements Serializable {
 				}
 			} else {
 				JPServer.mute(StatusPanel.this.player.getID());
-				StatusPanel.this.player.setMuted(true);
+				StatusPanel.this.player.muted = false;
 				if (!JPServer.serverOptions.isFrozen()) {
 					StatusPanel.this.statusButton.setIcon(StatusPanel.this.mutedIcon);
 				}
@@ -89,7 +89,7 @@ public class StatusPanel extends JPanel implements Serializable {
 	}
 
 	public void unfreeze() {
-		if (this.player.isMuted()) {
+		if (this.player.muted) {
 			this.statusButton.setIcon(this.mutedIcon);
 		} else {
 			this.statusButton.setIcon(this.connectedIcon);

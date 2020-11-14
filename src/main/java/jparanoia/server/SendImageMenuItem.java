@@ -17,9 +17,9 @@ public class SendImageMenuItem extends JMenuItem {
         addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "404" + SendImageMenuItem.this.getImageInfo() );
             JParanoia.displayImage( SendImageMenuItem.this.getImageInfo() );
-            if ( JPServer.keepLog ) {
+            if ( JPServer.serverOptions.isKeepLog() ) {
                 String str;
-                if ( JPServer.htmlLog ) {
+                if ( JPServer.serverOptions.isHtmlLog() ) {
                     str = "IMAGE: \"" +
                             SendImageMenuItem.this.imageItem.getName() +
                             "\" URL: <a href=\"" +
