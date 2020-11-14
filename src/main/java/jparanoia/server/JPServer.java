@@ -102,41 +102,50 @@ import jparanoia.shared.JParanoia;
 public class JPServer extends JParanoia {
 	private static final Logger logger = getLogger(MethodHandles.lookup().lookupClass());
 	public static final ServerOptions serverOptions = new ServerOptions();
-
 	public static Random rand = new Random();
-	//ServerChatThread
-	public static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>(); 
 	
+	//ServerChatThread
 	private static PrintWriter someWriter;
 	private static ServerSocketThread servSocketThread;
 	private static ServerChatThread thisThread;
 	//combatFrame
 	public static ServerPlayer[] players;
 	public static ServerPlayer myPlayer;
-	
-	//CombatFrame
 	public static int numberOfPCs = 0;
-	
 	//ServerChatThread
 	public static int numberOfConnectedClients = 0;
 	public static int numberOfConnectedObservers = 0;
 	public static ThreadGroup chatThreadGroup = new ThreadGroup( "my group of chat threads" );
 	public static JCheckBoxMenuItem hearObserversMenuItem;
 	public static int numberOfPlayers = 0;
-	
-	private static int randInt = rand.nextInt(1000);
+	public static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>();
 	//FontMenu
-	public static Integer mainFontSize = 99;
-	
-	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
-			+ randInt + ")";
+	public static Integer mainFontSize = 99;	
 	//SERVER_PLAYER
 	public static Vector<ServerPlayer> spareNpcs = new Vector<ServerPlayer>(10);
 	public static SimpleAttributeSet charsheetAttributes;
-	
+	//Server Socked Thread
+	public static JMenuItem startServerMenuItem;
+	public static JMenuItem stopServerMenuItem;
+	//Private Message Pane
+	public static ServerOptionsMenu optionsMenu;
 	//charsheet panel
 	public static ServerPlayer[] troubleshooters;
+	//CombatFrame
+	public static JButton freezeButton;
+	public static JButton combatButton;
+	//PrivateMessagePane
+	public static String currentColorScheme = "";
+	//ServerImageMenu
+	public static ImageDataParser idp;
+	//PrivateMessagePane
+	public static CharsheetPanel charsheetPanel;
 	
+	//The below variables are not mentioned in ANY outside classes. 
+	//They should be divided somehow.
+	private static int randInt = rand.nextInt(1000);
+	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
+			+ randInt + ")";
 	private static ServerPlayer playerToSpoof;
 	private static ServerPlayer pmTargetPlayer;
 	private static JScrollPane inputScrollPane;
@@ -149,8 +158,6 @@ public class JPServer extends JParanoia {
 	private static JPanel spoofPanel;
 	private static JPanel spoofAndFreezePanel;
 	private static JMenuBar menuBar;
-	//Private Message Pane
-	public static ServerOptionsMenu optionsMenu;
 	
 	private static JMenu serverMenu;
 	private static JMenu fontMenu;
@@ -159,10 +166,6 @@ public class JPServer extends JParanoia {
 	private static JMenu globalPMMenu;
 	private static JMenu sendImageMenu;
 	private static JMenu observersMenu;
-	//Server Socked Thread
-	public static JMenuItem startServerMenuItem;
-	public static JMenuItem stopServerMenuItem;
-	
 	private static JMenuItem sendGlobalPMMenuItem;
 	private static JMenuItem setGameDescriptionMenuItem;
 	private static JMenuItem showObserversListMenuItem;
@@ -170,20 +173,12 @@ public class JPServer extends JParanoia {
 	private static JCheckBoxMenuItem registerGameMenuItem;
 	private static JCheckBox spoofCheckBox;
 	public static JComboBox<? extends ServerPlayer> spoofComboBox;
-	//CombatFrame
-	public static JButton freezeButton;
-	public static JButton combatButton;
 	
 	private static JLabel ipLabel;
 	private static JScrollPane scrollPane;
 	private static JSplitPane splitPane;
 	public static JTextArea inputLine;
 	public static CombatFrame combatFrame;
-	//PrivateMessagePane
-	public static CharsheetPanel charsheetPanel;
-	
-	//ServerImageMenu
-	public static ImageDataParser idp;
 	
 	private static SimpleAttributeSet systemTextAttributes = new SimpleAttributeSet();
 	private static Color[] brightColors;
@@ -202,8 +197,6 @@ public class JPServer extends JParanoia {
 	private static Date timeStamp;
 	private static String gameDescription = defaultGameDescription;
 	private static String currentPlayerID = "00";
-	//PrivateMessagePane
-	public static String currentColorScheme = "";
 	
 	private static String newColorScheme = WHITE_ON_BLACK;
 	private static InetAddress localIP = null;
@@ -659,6 +652,8 @@ public class JPServer extends JParanoia {
 
 	public static class COMMANDS {
 		public static final String CLEAR_TITLE = "013";
+		public static final String MUTE_PLAYER = "051";
+		public static final String UNMUTE_PLAYER = "050";
 	}
 
 	public static synchronized void sendCommand(String paramString) {
@@ -1218,14 +1213,14 @@ public class JPServer extends JParanoia {
 	}
 
 	public static void mute(String paramString) {
-		sendCommand("051" + paramString);
+		sendCommand(COMMANDS.MUTE_PLAYER + paramString);
 		if (soundIsOn && soundMenu.mutedUnmutedMenuItem.isSelected()) {
 			soundPlayer.play(MUTED);
 		}
 	}
 
 	public static void unmute(String paramString) {
-		sendCommand("050" + paramString);
+		sendCommand(COMMANDS.UNMUTE_PLAYER + paramString);
 		if (soundIsOn && soundMenu.mutedUnmutedMenuItem.isSelected()) {
 			soundPlayer.play(UNMUTED);
 		}
