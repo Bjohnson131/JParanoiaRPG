@@ -55,11 +55,11 @@ public final class ServerConstants {
 	//Constants related to the warning that the server is not on the same local IP as the clients
 	public static final String WARN_BEHIND_ROUTER = "Behind a router";
 	public static final String WARN_NO_IP = "Error: Unable to get local host address";
-	private static final Pattern IP_REPLACE_REGEX = Pattern.compile("{IP}");
+	private static final Pattern IP_REPLACE_REGEX = Pattern.compile("8IP8");
 	private static final String ROUTER_WARNING_RAW = 
 	        "The JParanoia Game Registry has determined\nthat your computer is behind a router."
 	        + "\n\nPlayers should be able to connect without\nany problems if you have forwarded port 11777\n"
-	        + "to your local IP. ({IP})\n" + "\n"
+	        + "to your local IP. (8IP8)\n" + "\n"
 			+ "Consult the included README for details on\n"
 			+ "running a server from behind a router.\n" + "\n"
 			+ "This notice will only appear once each time\n"

@@ -39,8 +39,7 @@ import static jparanoia.shared.JPSounds.PLAYER_JOIN;
 import static jparanoia.shared.JPSounds.PLAYER_LEAVE;
 import static jparanoia.shared.JPSounds.UNFREEZE;
 import static jparanoia.shared.JPSounds.UNMUTED;
-import static org.slf4j.LoggerFactory.getLogger;
-
+import static org.slf4j.LoggerFactory.getLogger;//*/
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -100,13 +99,13 @@ import jparanoia.shared.GameLogger;
 import jparanoia.shared.GameRegistrar;
 import jparanoia.shared.JParanoia;
 
-public class JPServer.serverOptions extends JParanoia {
+public class JPServer extends JParanoia {
 	private static final Logger logger = getLogger(MethodHandles.lookup().lookupClass());
 	public static final ServerOptions serverOptions = new ServerOptions();
 
 	public static Random rand = new Random();
 	//ServerChatThread
-	//public static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>();
+	public static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>(); 
 	
 	private static PrintWriter someWriter;
 	private static ServerSocketThread servSocketThread;
@@ -132,7 +131,7 @@ public class JPServer.serverOptions extends JParanoia {
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
 	//SERVER_PLAYER
-	public static Vector<ServerPlayer> spareNpcs = new Vector<>(10);
+	public static Vector<ServerPlayer> spareNpcs = new Vector<ServerPlayer>(10);
 	public static SimpleAttributeSet charsheetAttributes;
 	
 	//charsheet panel
@@ -252,7 +251,8 @@ public class JPServer.serverOptions extends JParanoia {
 				numberOfPCs += 1;
 			}
 		}
-		troubleshooters = new ServerPlayer[numberOfPCs - 1];
+		int pclen = numberOfPCs>1?numberOfPCs-1:1;
+		troubleshooters = new ServerPlayer[pclen];
 		arraycopy(players, 1, troubleshooters, 0, numberOfPCs - 1);
 		for (final ServerPlayer troubleshooter : troubleshooters) {
 			sortedNames.add(troubleshooter);
@@ -655,6 +655,10 @@ public class JPServer.serverOptions extends JParanoia {
 		}
 		frame.dispose();
 		System.exit(0);
+	}
+
+	public static class COMMANDS {
+		public static final String CLEAR_TITLE = "013";
 	}
 
 	public static synchronized void sendCommand(String paramString) {
@@ -1341,6 +1345,8 @@ public class JPServer.serverOptions extends JParanoia {
 			useGmFont();
 		}
 	}
+	
+
 }
 
 /*
@@ -1359,11 +1365,10 @@ public class JPServer.serverOptions extends JParanoia {
  * paramString); }
  */
 
-/*
- * public static void clearTitleMessage() { //TODO: Patch
- * //myTitle.clearExtra(); frame.setTitle(ServerConstants.WELCOME_MESSAGE);
- * spamString("013"); }
- */
+/*public static void clearTitleMessage() { //TODO: Patch
+//myTitle.clearExtra(); frame.setTitle(ServerConstants.WELCOME_MESSAGE);
+sendCommand("013"); 
+}*/ 
 
 // private static TitleClass myTitle = new TitleClass("JParanoia Community
 // Server", ServerConstants.JPARANOIA_VERSION,false);

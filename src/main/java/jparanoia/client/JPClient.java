@@ -1,4 +1,5 @@
 package jparanoia.client;
+
 import java.awt.Color;
 import static java.awt.Color.black;
 import static java.awt.Color.white;
@@ -48,6 +49,8 @@ import javax.swing.text.StyleConstants;
 import jparanoia.shared.BrightColorArray;
 import jparanoia.shared.GameLogger;
 import jparanoia.shared.GameRegistrar;
+import jparanoia.shared.JPPlayer;
+
 import static jparanoia.shared.JPSounds.BAD_LOGIN;
 import static jparanoia.shared.JPSounds.CHARSHEET_ALERT;
 import static jparanoia.shared.JPSounds.COMBAT_ALERT;
@@ -160,7 +163,7 @@ public class JPClient extends JParanoia {
     static int MY_PLAYER_NUMBER;
     static String currentColorScheme = "";
     static String newColorScheme = WHITE_ON_BLACK;
-    static String styleBegin;
+    static String styleBegin; 
     static String styleEnd = "";
     static String realName = "default";
     static boolean stayConnected = false;
@@ -662,22 +665,22 @@ public class JPClient extends JParanoia {
         if ( paramBoolean ) {
             if ( lastCompletionPlayer == sortedNames.size() - 1 ) {
                 lastCompletionPlayer = 0;
-                lastNameCompleted = ( (ClientPlayer) sortedNames.get( lastCompletionPlayer ) ).getName();
+                lastNameCompleted = sortedNames.get( lastCompletionPlayer ).getName();
                 return str2 + lastNameCompleted;
             }
-            lastNameCompleted = ( (ClientPlayer) sortedNames.get( ++lastCompletionPlayer ) ).getName();
+            lastNameCompleted = sortedNames.get( ++lastCompletionPlayer ).getName();
             return str2 + lastNameCompleted;
         }
         for ( int i = 0;
               i < sortedNames.size() &&
-                      str1.compareToIgnoreCase( ( (ClientPlayer) sortedNames.get( i ) ).getName() ) > 0;
+                      str1.compareToIgnoreCase(sortedNames.get( i ).getName() ) > 0;
               i++ ) {
             if ( i < sortedNames.size() ) {
                 lastCompletionPlayer = i;
             } else {
                 lastCompletionPlayer = sortedNames.size() - 1;
             }
-            lastNameCompleted = ( (ClientPlayer) sortedNames.get( lastCompletionPlayer ) ).getName();
+            lastNameCompleted = ( sortedNames.get( lastCompletionPlayer ) ).getName();
         }
         return str2 + lastNameCompleted;
     }
@@ -797,9 +800,10 @@ public class JPClient extends JParanoia {
         }
         sortedNames.remove( playerList[i] );
         playerList[i] = new ClientPlayer( i, str, bool1, bool2 );
-        if ( playerList[i].isAPlayer() ) {
+        //TODO: something here is fucky.
+        /*if ( playerList[i].isAPlayer() ) {
             sortedNames.add( playerList[i] );
-        }
+        }*/
         sortNames();
         if ( localColor != null ) {
             playerList[i].setChatColor( localColor );
@@ -854,8 +858,8 @@ public class JPClient extends JParanoia {
             int i = sortedNames.size() - 1;
             int j = i - 1;
             while ( j >= 0 &&
-                    ( (ClientPlayer) sortedNames.get( i ) ).getName()
-                            .compareToIgnoreCase( ( (ClientPlayer) sortedNames.get( j ) ).getName() ) < 0 ) {
+                    sortedNames.get( i ).realName
+                            .compareToIgnoreCase( sortedNames.get( j ).realName ) < 0 ) {
                 sortedNames.add( i, sortedNames.remove( j ) );
                 i = j;
                 j--;

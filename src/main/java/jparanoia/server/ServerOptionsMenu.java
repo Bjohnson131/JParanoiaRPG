@@ -6,7 +6,6 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JRadioButtonMenuItem;
-import static jparanoia.server.JPServer.keepLog;
 
 import jparanoia.server.constants.ServerConstants;
 import jparanoia.shared.GameLogger;
@@ -61,9 +60,9 @@ public class ServerOptionsMenu extends JMenu {
         this.makeLogMenuItem.setToolTipText( "Logs are saved in the 'logs' directory." );
         this.makeLogMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 20 ) );
         this.makeLogMenuItem.addActionListener( paramAnonymousActionEvent -> {
-            keepLog = !keepLog;
-            logger.info( "KEEP LOG = " + keepLog );
-            if ( keepLog ) {
+        	JPServer.serverOptions.setKeepLog( !JPServer.serverOptions.isKeepLog() );
+            logger.info( "KEEP LOG = " + JPServer.serverOptions.isKeepLog() );
+            if ( JPServer.serverOptions.isKeepLog() ) {
                 log = new GameLogger();
             } else {
                 log.closeLog();
@@ -84,63 +83,63 @@ public class ServerOptionsMenu extends JMenu {
         this.bigComputerFontMenuItem.setToolTipText( "<HTML>When disabled, players see The Computer's font<BR>in the increased size but you do not.</HTML>" );
         this.bigComputerFontMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 25 ) );
         this.bigComputerFontMenuItem.addActionListener( paramAnonymousActionEvent -> {
-            JPServer.serverOptions.setBigComputerFont(!JPServer.serverOptions.isBigComputerFont();
+            JPServer.serverOptions.setBigComputerFont(!JPServer.serverOptions.isBigComputerFont());
         } );
         this.computerAllCapsMenuItem = new JCheckBoxMenuItem( "Computer speech in CAPS" );
         this.computerAllCapsMenuItem.setToolTipText( "Show The Computer's speech in ALL CAPS." );
         this.computerAllCapsMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 27 ) );
-        this.computerAllCapsMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.computerAllCaps = !JPServer.computerAllCaps );
+        this.computerAllCapsMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.serverOptions.setComputerAllCaps(!JPServer.serverOptions.isComputerAllCaps()) );
         this.computerFontIncreaseMenu = new JMenu( "Computer font increase" );
         this.computerFontIncreaseMenu.setToolTipText( "<HTML>Amount to increase<BR>The Computer's font size.</HTML>" );
         this.cpuIncrease0 = new JRadioButtonMenuItem( "None" );
         this.cpuIncrease0.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "0700" );
-            JPServer.computerFontIncrease = 0;
+            JPServer.serverOptions.setComputerFontIncrease(0);
         } );
         this.cpuIncrease2 = new JRadioButtonMenuItem( "2 points" );
         this.cpuIncrease2.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "0702" );
-            JPServer.computerFontIncrease = 2;
+            JPServer.serverOptions.setComputerFontIncrease(2);
         } );
         this.cpuIncrease4 = new JRadioButtonMenuItem( "4 points" );
         this.cpuIncrease4.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "0704" );
-            JPServer.computerFontIncrease = 4;
+            JPServer.serverOptions.setComputerFontIncrease(4);
         } );
         this.cpuIncrease6 = new JRadioButtonMenuItem( "6 points" );
         this.cpuIncrease6.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "0706" );
-            JPServer.computerFontIncrease = 6;
+            JPServer.serverOptions.setComputerFontIncrease(6);
         } );
         this.cpuIncrease8 = new JRadioButtonMenuItem( "8 points" );
         this.cpuIncrease8.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "0708" );
-            JPServer.computerFontIncrease = 8;
+            JPServer.serverOptions.setComputerFontIncrease(8);
         } );
         this.cpuIncrease10 = new JRadioButtonMenuItem( "10 points" );
         this.cpuIncrease10.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "07010" );
-            JPServer.computerFontIncrease = 10;
+            JPServer.serverOptions.setComputerFontIncrease(10);
         } );
         this.cpuIncrease12 = new JRadioButtonMenuItem( "12 points" );
         this.cpuIncrease12.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "07012" );
-            JPServer.computerFontIncrease = 12;
+            JPServer.serverOptions.setComputerFontIncrease(12);
         } );
         this.cpuIncrease14 = new JRadioButtonMenuItem( "14 points" );
         this.cpuIncrease14.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "07014" );
-            JPServer.computerFontIncrease = 14;
+            JPServer.serverOptions.setComputerFontIncrease(14);
         } );
         this.cpuIncrease16 = new JRadioButtonMenuItem( "16 points" );
         this.cpuIncrease16.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "07016" );
-            JPServer.computerFontIncrease = 16;
+            JPServer.serverOptions.setComputerFontIncrease(16);
         } );
         this.cpuIncrease18 = new JRadioButtonMenuItem( "18 points" );
         this.cpuIncrease18.addActionListener( paramAnonymousActionEvent -> {
             JPServer.sendCommand( "07018" );
-            JPServer.computerFontIncrease = 18;
+            JPServer.serverOptions.setComputerFontIncrease(18);
         } );
         ButtonGroup localButtonGroup = new ButtonGroup();
         localButtonGroup.add( this.cpuIncrease0 );
@@ -199,7 +198,7 @@ public class ServerOptionsMenu extends JMenu {
         this.titleMessageMenuItem.setToolTipText( "<HTML>Displays a message in the title bar<BR>of everyone's main window.</HTML>" );
 
         this.clearTitleMessageMenuItem = new JMenuItem( "Clear Title Message" );
-        this.clearTitleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.clearTitleMessage() );
+        this.clearTitleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.sendCommand(JPServer.COMMANDS.CLEAR_TITLE) );
         this.useAnnouncementMenuItem = new JCheckBoxMenuItem( "Use Announcement" );
         this.useAnnouncementMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 37 ) );
         this.setAnnouncementMenuItem = new JMenuItem( "Set Announcement..." );
@@ -237,7 +236,7 @@ public class ServerOptionsMenu extends JMenu {
         add( this.singleUseSpoofMenuItem );
         addSeparator();
         add( JPServer.aboutBoxMenuItem );
-        JPServer.computerAllCaps = this.computerAllCapsMenuItem.isSelected();
+        JPServer.serverOptions.setComputerAllCaps( this.computerAllCapsMenuItem.isSelected() );
     }
 }
 

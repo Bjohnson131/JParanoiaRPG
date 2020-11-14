@@ -28,6 +28,8 @@ import static jparanoia.server.JPServer.absoluteChat;
 import static jparanoia.server.JPServer.sendCommand;
 import static jparanoia.server.JPServer.troubleshooters;
 import jparanoia.shared.ErrorLogger;
+import jparanoia.shared.JParanoia;
+
 import static jparanoia.shared.JParanoia.errLog;
 import static jparanoia.shared.JParanoia.errorMessage;
 import org.slf4j.Logger;
@@ -62,7 +64,7 @@ public class CombatFrame extends JFrame {
 
     public CombatFrame() {
         super( "Combat Manager" );
-        if ( !JPServer.frame.isVisible() ) {
+        if ( !JParanoia.frame.isVisible() ) {
             dispose();
             return;
         }

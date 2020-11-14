@@ -70,8 +70,9 @@ public class ServerPlayer extends JPPlayer implements Serializable {
 	public int clearanceInt;
 	private String sector;
 	private String password;
-	//JPServer
+	//JPServer,JPClient
 	public String realName;
+	//JPServer
 	public ServerPlayerMenu playerMenu;
 	public NPCMenu npcMenu;
 	private JCheckBox globalExcludeCheckBox;

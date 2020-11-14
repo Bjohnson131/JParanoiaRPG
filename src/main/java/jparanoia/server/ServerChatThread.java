@@ -11,7 +11,6 @@ import java.util.Random;
 import java.util.Vector;
 import static jparanoia.server.JPServer.absoluteChat;
 import static jparanoia.server.JPServer.actionChat;
-import static jparanoia.server.JPServer.chatThreads;
 import static jparanoia.server.JPServer.combatButton;
 import static jparanoia.server.JPServer.combatFrame;
 import static jparanoia.server.JPServer.generalChat;
@@ -300,8 +299,8 @@ class ServerChatThread extends Thread {
         }
         synchronized ( JPServer.chatThreads ) {
             this.threadNumber = numberOfConnectedClients;
-            chatThreads.add( this );
-            numberOfConnectedClients = chatThreads.size();
+            JPServer.chatThreads.add( this );
+            numberOfConnectedClients = JPServer.chatThreads.size();
             logger.info( "JPServer.numberOfConnectedClients == " + numberOfConnectedClients );
             if ( !combatButton.isEnabled() &&
                     numberOfConnectedClients - numberOfConnectedObservers > 1 ) {
@@ -396,12 +395,12 @@ class ServerChatThread extends Thread {
         }
         synchronized ( JPServer.chatThreads ) {
             if ( this.observer || this.thisPlayer.loggedIn ) {
-                chatThreads.remove( this.threadNumber );
+            	JPServer.chatThreads.remove( this.threadNumber );
             }
             if ( !this.observer && this.thisPlayer.loggedIn ) {
                 playerHasLeft( this.playerID );
             }
-            numberOfConnectedClients = chatThreads.size();
+            numberOfConnectedClients = JPServer.chatThreads.size();
             logger.info( "JPServer.numberOfConnectedClients == " + numberOfConnectedClients );
             reassignThreadNumbers();
         }
