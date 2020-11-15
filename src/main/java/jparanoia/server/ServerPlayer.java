@@ -20,7 +20,6 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleContext;
 import static jparanoia.server.JPServer.absoluteChat;
 import static jparanoia.server.JPServer.absoluteSpam;
-import static jparanoia.server.JPServer.repaintMenus;
 import static jparanoia.server.JPServer.sendCommand;
 import static jparanoia.server.JPServer.stripComments;
 
@@ -395,7 +394,7 @@ public class ServerPlayer extends JPPlayer implements Serializable {
 			this.cloneNumber = 1;
 			this.isDead = false;
 			this.globalExcludeCheckBox.setText(getName());
-			repaintMenus();
+			JPServer.repaintMenus();
 			this.playerMenu.setText(getName());
 			sendCommand("010" + getID() + "p" + str6 + str5 + "-" + this.cloneNumber);
 			saveCharsheet(false);

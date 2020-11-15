@@ -198,7 +198,7 @@ public class ServerOptionsMenu extends JMenu {
         this.titleMessageMenuItem.setToolTipText( "<HTML>Displays a message in the title bar<BR>of everyone's main window.</HTML>" );
 
         this.clearTitleMessageMenuItem = new JMenuItem( "Clear Title Message" );
-        this.clearTitleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.sendCommand(JPServer.COMMANDS.CLEAR_TITLE) );
+        this.clearTitleMessageMenuItem.addActionListener( paramAnonymousActionEvent -> JPServer.sendCommand(ServerConstants.COMMANDS.CLEAR_TITLE) );
         this.useAnnouncementMenuItem = new JCheckBoxMenuItem( "Use Announcement" );
         this.useAnnouncementMenuItem.setSelected( (Boolean) JPServer.prefs.getPref( 37 ) );
         this.setAnnouncementMenuItem = new JMenuItem( "Set Announcement..." );

@@ -136,6 +136,37 @@ public final class ServerConstants {
             "\n" +
             "Correct the error and relaunch the server.";
 	
+	/*A class to organize command codes
+	 * At some point, the codes should be re-organized to B64
+	 * */
+	public static class COMMANDS {
+		
+		//JFrame trickery
+		public static final String CLEAR_TITLE = "013";
+		
+		//Player muting perms
+		public static final String UNMUTE_PLAYER = "050";
+		public static final String MUTE_PLAYER = "051";
+		public static final String FREEZE_PLAYERS = "052";
+		public static final String UNFREEZE_PLAYERS = "053";
+		
+		//Player Death
+		public static final String NOTIFY_DEATH = "060";
+		public static final String NOTIFY_UNDEATH = "061";
+		
+		//Server info.
+		public static final String SERVER_TERMINATION = "086";
+
+		//Messaging
+		public static final String GLOBAL_MESSAGE = "199";
+		public static final String PRIVATE_MESSAGE = "210";
+		public static final String END_PRIVATE_MESSAGE = "211";
+		
+		//Combat
+		public static final String END_COMBAT  = "597";
+		public static final String START_COMBAT_ROUND = "599"; //Unknown if correct.
+		public static final String ABORT_COMBAT = "609";
+	}
 	
 	
 	private ServerConstants() {
