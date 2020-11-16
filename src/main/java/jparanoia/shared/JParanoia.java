@@ -27,6 +27,7 @@ import static jparanoia.shared.JPSounds.STARTUP;
 import static jparanoia.shared.Prefs.PLAY_SOUNDS;
 import org.slf4j.Logger;
 
+import jparanoia.names.NameManager;
 import jparanoia.server.ServerPlayer;
 
 import static org.slf4j.LoggerFactory.getLogger;
@@ -50,12 +51,8 @@ public abstract class JParanoia {
     public static boolean autoScroll = true;
     public static boolean announceObservers = true;
     
-    public static int previousKey = 0;
-    public static int thisKey = 100;
-    public static int lastCompletionPlayer = 99;
+    public static NameManager nMgr = new NameManager();
     
-    public static String lastNameCompleted = "";
-    public static ArrayList<ServerPlayer> sortedNames = new ArrayList<ServerPlayer>( 8 );
     public static Vector obsNames = new Vector( 40 );
     public static GameLogger log;
     public static ErrorLogger errLog;

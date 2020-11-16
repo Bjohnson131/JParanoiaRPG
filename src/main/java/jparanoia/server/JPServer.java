@@ -3,16 +3,10 @@ package jparanoia.server;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -26,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -45,10 +38,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
-import javax.swing.WindowConstants;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.PlainDocument;
@@ -60,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 
 import jparanoia.server.constants.ServerConstants;
+import jparanoia.server.window.WindowSetup;
 import jparanoia.shared.BrightColorArray;
 import jparanoia.shared.ErrorLogger;
 import jparanoia.shared.GameLogger;
@@ -71,46 +63,46 @@ public class JPServer extends JParanoia {
 	private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	public static final ServerOptions serverOptions = new ServerOptions();
 	public static Random rand = new Random();
-	
-	//ServerChatThread
+
+	// ServerChatThread
 	private static PrintWriter someWriter;
 	private static ServerSocketThread servSocketThread;
 	private static ServerChatThread thisThread;
-	//combatFrame
+	// combatFrame
 	public static ServerPlayer[] players;
 	public static ServerPlayer myPlayer;
 	public static int numberOfPCs = 0;
-	//ServerChatThread
+	// ServerChatThread
 	public static int numberOfConnectedClients = 0;
 	public static int numberOfConnectedObservers = 0;
-	public static ThreadGroup chatThreadGroup = new ThreadGroup( "my group of chat threads" );
+	public static ThreadGroup chatThreadGroup = new ThreadGroup("my group of chat threads");
 	public static JCheckBoxMenuItem hearObserversMenuItem;
 	public static int numberOfPlayers = 0;
 	public static final ArrayList<ServerChatThread> chatThreads = new ArrayList<>();
-	//FontMenu
-	public static Integer mainFontSize = 99;	
-	//SERVER_PLAYER
+	// FontMenu
+	public static Integer mainFontSize = 99;
+	// SERVER_PLAYER
 	public static Vector<ServerPlayer> spareNpcs = new Vector<ServerPlayer>(10);
 	public static SimpleAttributeSet charsheetAttributes;
-	//Server Socked Thread
+	// Server Socked Thread
 	public static JMenuItem startServerMenuItem;
 	public static JMenuItem stopServerMenuItem;
-	//Private Message Pane
+	// Private Message Pane
 	public static ServerOptionsMenu optionsMenu;
-	//charsheet panel
+	// charsheet panel
 	public static ServerPlayer[] troubleshooters;
-	//CombatFrame
+	// CombatFrame
 	public static JButton freezeButton;
 	public static JButton combatButton;
-	//PrivateMessagePane
+	// PrivateMessagePane
 	public static String currentColorScheme = "";
-	//ServerImageMenu
+	// ServerImageMenu
 	public static ImageDataParser idp;
-	//PrivateMessagePane
+	// PrivateMessagePane
 	public static CharsheetPanel charsheetPanel;
-	
-	//The below variables are not mentioned in ANY outside classes. 
-	//They should be divided somehow.
+
+	// The below variables are not mentioned in ANY outside classes.
+	// They should be divided somehow.
 	private static int randInt = rand.nextInt(1000);
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
@@ -126,7 +118,7 @@ public class JPServer extends JParanoia {
 	private static JPanel spoofPanel;
 	private static JPanel spoofAndFreezePanel;
 	private static JMenuBar menuBar;
-	
+
 	private static JMenu serverMenu;
 	private static JMenu fontMenu;
 	private static JMenu playerMenu;
@@ -141,58 +133,39 @@ public class JPServer extends JParanoia {
 	private static JCheckBoxMenuItem registerGameMenuItem;
 	private static JCheckBox spoofCheckBox;
 	public static JComboBox<? extends ServerPlayer> spoofComboBox;
-	
+
 	private static JLabel ipLabel;
 	private static JScrollPane scrollPane;
 	private static JSplitPane splitPane;
 	public static JTextArea inputLine;
 	public static CombatFrame combatFrame;
-	
+
 	private static SimpleAttributeSet systemTextAttributes = new SimpleAttributeSet();
 	private static Color[] brightColors;
-	private static Color[] darkColors = { 
-			new Color(0.1F, 0.1F, 0.1F), 
-			new Color(0.6F, 0.3F, 0.0F),
-			new Color(0.0F, 0.4F, 0.0F),
-			new Color(0.2F, 0.6F, 0.4F),
-			new Color(0.3F, 0.1F, 0.8F),
-			new Color(0.5F, 0.1F, 0.5F),
-			new Color(0.3F, 0.3F, 0.3F),
-			new Color(0.0F, 0.0F, 0.4F),
-			new Color(0.4F, 0.0F, 0.0F),
-			new Color(0.1F, 0.4F, 0.4F)
-			};
 	private static Date timeStamp;
 	private static String gameDescription = defaultGameDescription;
 	private static String currentPlayerID = "00";
-	
-	private static String newColorScheme = WHITE_ON_BLACK;
+
+	private static final String newColorScheme = JParanoia.WHITE_ON_BLACK;
 	private static InetAddress localIP = null;
 	private static PrivateMessagePane[] PMPane;
 	private static PMAndStatusPanel[] pmstatus;
-	private static Font normalFont = new Font(null, Font.PLAIN, 12);
-	private static Font spoofFont = new Font(null, Font.BOLD, 16);
-	
+
 	public JPServer() {
+		chatDocument = new DefaultStyledDocument();
+		brightColors = new BrightColorArray().getColors();
+		// Code above this point seems to have no effect whether commented out or not.
+
 		Profiler profiler = new Profiler("JPServer");
 
 		setOptions();
 
-		profiler.start("frame init");
-		frame.setTitle(ServerConstants.WELCOME_MESSAGE);
-		frame.setIconImage(Toolkit.getDefaultToolkit()
-				.getImage(Thread.currentThread().getContextClassLoader().getResource("graphics/jparanoiaIcon.jpg")));
-		frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		frame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent paramAnonymousWindowEvent) {
-				JPServer.exit();
-			}
-		});
 		try {
 			localIP = InetAddress.getLocalHost();
 		} catch (UnknownHostException localUnknownHostException) {
 			logger.warn(ServerConstants.WARN_NO_IP);
 		}
+
 		charsheetAttributes = new SimpleAttributeSet();
 		charsheetAttributes.addAttribute(StyleConstants.Bold, true);
 		charsheetAttributes.addAttribute(StyleConstants.Family, "SansSerif");
@@ -212,21 +185,25 @@ public class JPServer extends JParanoia {
 				numberOfPCs += 1;
 			}
 		}
-		
-		int pclen = numberOfPCs>1?numberOfPCs-1:1;
+
+		int pclen = numberOfPCs > 1 ? numberOfPCs - 1 : 1;
 		troubleshooters = new ServerPlayer[pclen];
 		System.arraycopy(players, 1, troubleshooters, 0, pclen);
-		
+
 		for (final ServerPlayer troubleshooter : troubleshooters) {
-			sortedNames.add(troubleshooter);
-			if (sortedNames.size() > 1) {
-				int j = sortedNames.size() - 1;
+			JParanoia.nMgr.addPlayer(troubleshooter);
+			if (JParanoia.nMgr.playerCount() > 1) {
+				int j = JParanoia.nMgr.playerCount() - 1;
 				int k = j - 1;
-				while (k >= 0 && ((ServerPlayer) sortedNames.get(j)).getName()
-						.compareToIgnoreCase(((ServerPlayer) sortedNames.get(k)).getName()) < 0) {
-					sortedNames.add(j, sortedNames.remove(k));
+				String nameJ = JParanoia.nMgr.getPlayerAt(j).getName(), nameK = JParanoia.nMgr.getPlayerAt(k).getName();
+				while (k >= 0 && nameJ.compareToIgnoreCase(nameK) < 0) {
+					ServerPlayer toReplace = JParanoia.nMgr.getPlayerAt(k);
+					JParanoia.nMgr.removeAtIndex(k);
+					JParanoia.nMgr.addPlayerAtIndex(toReplace,j);
 					j = k;
 					k--;
+					nameJ = JParanoia.nMgr.getPlayerAt(j).getName();
+					nameK = JParanoia.nMgr.getPlayerAt(k).getName();
 				}
 			}
 		}
@@ -234,16 +211,11 @@ public class JPServer extends JParanoia {
 		myPlayer = players[0];
 
 		profiler.start("further frame init");
-		frame.setSize(770, 540);
-		
-		
-		displayArea.setEditable(false);
-		displayArea.setEnabled(true);
-		displayArea.setBackground(Color.black);
-		
-		scrollPane = new JScrollPane(displayArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		chatDocument = new DefaultStyledDocument();
-		brightColors = new BrightColorArray().getColors();
+		WindowSetup.setupServerTextFrame(displayArea);
+
+		scrollPane = new JScrollPane(displayArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
 		textAttributes = new SimpleAttributeSet();
 		textAttributes.addAttribute(StyleConstants.Foreground, Color.white);
 		textAttributes.addAttribute(StyleConstants.Size, prefs.getPref(15));
@@ -251,56 +223,12 @@ public class JPServer extends JParanoia {
 		systemTextAttributes.addAttribute(StyleConstants.Foreground, Color.gray);
 		setColorScheme();
 		new PlainDocument();
-		
-		//Set up the Input text box
-		inputLine = new JTextArea(3, 44);
-		inputLine.setLineWrap(true);
-		inputLine.setWrapStyleWord(true);
-		inputLine.setEnabled(false);
-		inputLine.setFont(normalFont);
-		inputLine.addKeyListener(new KeyListener() {
-			@Override
-			public void keyTyped(KeyEvent paramAnonymousKeyEvent) {
-			}
 
-			@Override
-			public void keyPressed(KeyEvent paramAnonymousKeyEvent) {
-				previousKey = thisKey;
-				thisKey = paramAnonymousKeyEvent.getKeyCode();
-				String str;
-				if (thisKey == 10 && serverOptions.isSendMainText()) {
-					str = inputLine.getText();
-					if (str.length() > 0) {
-						inputLine.setCaretPosition(str.length());
-					}
-				}
-				if (thisKey == 9) {
-					paramAnonymousKeyEvent.consume();
-					if (inputLine.getText().length() > 0) {
-						str = inputLine.getText();
-						if (str.startsWith("'") && str.length() > 1) {
-							inputLine.setText("'" + nameCompletion(str.substring(1), thisKey == previousKey));
-						} else if (!str.startsWith("'")) {
-							inputLine.setText(nameCompletion(str, thisKey == previousKey));
-						}
-					}
-				}
-			}
+		// Set up the Input text box
+		WindowSetup.setupInputTextPane(inputLine, serverOptions, JParanoia.nMgr);
 
-			@Override
-			public void keyReleased(KeyEvent paramAnonymousKeyEvent) {
-				if (paramAnonymousKeyEvent.getKeyCode() == KeyEvent.VK_ENTER && serverOptions.isSendMainText()) {
-					String str = inputLine.getText();
-					if (str.length() > 0) {
-						sendChat(str.substring(0, str.length() - 1));
-					}
-				} else if (paramAnonymousKeyEvent.getKeyCode() == KeyEvent.VK_ENTER && !serverOptions.isSendMainText()) {
-					setSendMainText(true);
-				}
-			}
-		});
-		
-		inputScrollPane = new JScrollPane(inputLine, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		inputScrollPane = new JScrollPane(inputLine, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		ServerPlayer[] arrayOfServerPlayer = new ServerPlayer[players.length - 1];
 		System.arraycopy(players, 1, arrayOfServerPlayer, 0, players.length - 1);
 		spoofComboBox = new JComboBox<>(arrayOfServerPlayer);
@@ -319,10 +247,10 @@ public class JPServer extends JParanoia {
 		spoofCheckBox.addActionListener(paramAnonymousActionEvent -> {
 			if (spoofCheckBox.isSelected()) {
 				currentPlayerID = playerToSpoof.getID();
-				inputLine.setFont(spoofFont);
+				inputLine.setFont(ServerConstants.FONT_SPOOF);
 			} else {
 				currentPlayerID = "00";
-				inputLine.setFont(normalFont);
+				inputLine.setFont(ServerConstants.FONT_NORMAL);
 			}
 			inputLine.requestFocus();
 		});
@@ -361,19 +289,18 @@ public class JPServer extends JParanoia {
 		inputPanel.add(inputScrollPane);
 		charsheetPanel = new CharsheetPanel();
 		menuBar = new JMenuBar();
-		frame.setJMenuBar(menuBar);
 		serverMenu = new JMenu("Server");
-		
-		//TODO: Organize these.
+
+		// TODO: Organize these.
 		startServerMenuItem = new JMenuItem("Start server");
 		startServerMenuItem.setToolTipText("Opens your computer for new connections.");
 		startServerMenuItem.addActionListener(paramAnonymousActionEvent -> startServer());
-		
-		//TODO: Organize these.
+
+		// TODO: Organize these.
 		stopServerMenuItem = new JMenuItem("Stop server");
 		stopServerMenuItem.setToolTipText("Stops your computer from accepting new connections.");
 		stopServerMenuItem.addActionListener(paramAnonymousActionEvent -> stopServer());
-		
+
 		registerGameMenuItem = new JCheckBoxMenuItem("Register Game");
 		registerGameMenuItem.setToolTipText(
 				"<HTML>When checked, your server will be made available<BR>to players via the JParanoia Game Registry so they<BR>will not need the IP address of your server.</HTML>");
@@ -398,8 +325,8 @@ public class JPServer extends JParanoia {
 		setGameDescriptionMenuItem
 				.setToolTipText("<HTML>This changes the name of your game<BR> on the JParanoia Game Registry.</HTML>");
 		setGameDescriptionMenuItem.addActionListener(paramAnonymousActionEvent -> {
-			String str = (String) JOptionPane.showInputDialog(null, "Enter a description for your game:", "Set Game Description...",
-					JOptionPane.PLAIN_MESSAGE, null, null, gameDescription);
+			String str = (String) JOptionPane.showInputDialog(null, "Enter a description for your game:",
+					"Set Game Description...", JOptionPane.PLAIN_MESSAGE, null, null, gameDescription);
 			if (str != null && !str.equals("") && !str.equals(gameDescription)) {
 				gameDescription = str;
 				if (serverOptions.isGameRegistered()) {
@@ -548,9 +475,8 @@ public class JPServer extends JParanoia {
 //            JParanoia.aboutBoxMenuItem.doClick();
 //        });
 		mainFontSize = (Integer) textAttributes.getAttribute(StyleConstants.Size);
-		if (serverOptions.isPXPGame()) {
-			frame.setSize(855, frame.getHeight());
-		}
+
+		WindowSetup.setupServerJframe(JParanoia.frame, menuBar, serverOptions);
 		frame.setVisible(true);
 		profiler.stop().print();
 	}
@@ -595,7 +521,7 @@ public class JPServer extends JParanoia {
 			if (JOptionPane.showConfirmDialog(frame,
 					"WARNING: Players are still connected!\nAre you SURE you want to quit?", "Quit confirmation...",
 					JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == 0) {
-				sendCommand(ServerConstants.COMMANDS.SERVER_TERMINATION+"SERVER TERMINATED");
+				sendCommand(ServerConstants.COMMANDS.SERVER_TERMINATION + "SERVER TERMINATED");
 			} else {
 				return;
 			}
@@ -633,7 +559,7 @@ public class JPServer extends JParanoia {
 		}
 	}
 
-	//TODO: used once, replace with in-line code
+	// TODO: used once, replace with in-line code
 	private static void setColorScheme() {
 		if (!currentColorScheme.equals(newColorScheme)) {
 			switch (newColorScheme) {
@@ -650,7 +576,7 @@ public class JPServer extends JParanoia {
 				break;
 			}
 			currentColorScheme = newColorScheme;
-			
+
 			// Start to assign colors to characters.
 			int i;
 			switch (currentColorScheme) {
@@ -661,14 +587,14 @@ public class JPServer extends JParanoia {
 				break;
 			case BLACK_ON_WHITE:
 				for (i = 0; i < numberOfPlayers; i++) {
-					players[i].chatColor = darkColors[i];
+					players[i].chatColor = ServerConstants.COLORS_DARK[i];
 				}
 				break;
 			default:
 				logger.error("Error: invalid color logic");
 				break;
 			}
-			
+
 		}
 	}
 
@@ -676,8 +602,7 @@ public class JPServer extends JParanoia {
 		ServerPlayer localServerPlayer = players[paramInt];
 		localServerPlayer.loggedIn = true;
 		localServerPlayer.pmPane.enableInput();
-		absoluteChat(
-				"--- " + localServerPlayer.toString() + " (" + localServerPlayer.realName + ") has joined ---");
+		absoluteChat("--- " + localServerPlayer.toString() + " (" + localServerPlayer.realName + ") has joined ---");
 		if (serverOptions.isShowTimeStamps()) {
 			displayTimeStamp();
 		}
@@ -1033,39 +958,8 @@ public class JPServer extends JParanoia {
 		}
 	}
 
-	static String nameCompletion(String paramString, boolean paramBoolean) {
-		String str1 = "";
-		StringBuilder str2 = new StringBuilder();
-		if (paramBoolean) {
-			paramString = paramString.substring(0, paramString.length() - lastNameCompleted.length() + 1);
-		}
-		st = new StringTokenizer(paramString);
-		str1 = st.nextToken();
-		while (st.hasMoreTokens()) {
-			str2.append(str1).append(" ");
-			str1 = st.nextToken();
-		}
-		if (paramBoolean) {
-			if (lastCompletionPlayer == sortedNames.size() - 1) {
-				lastCompletionPlayer = 0;
-				lastNameCompleted = ((ServerPlayer) sortedNames.get(lastCompletionPlayer)).getName();
-				return str2 + lastNameCompleted;
-			}
-			lastNameCompleted = ((ServerPlayer) sortedNames.get(++lastCompletionPlayer)).getName();
-			return str2 + lastNameCompleted;
-		}
-		for (int i = 0; i < sortedNames.size()
-				&& str1.compareToIgnoreCase(((ServerPlayer) sortedNames.get(i)).getName()) > 0; i++) {
-			if (i < sortedNames.size()) {
-				lastCompletionPlayer = i;
-			} else {
-				lastCompletionPlayer = sortedNames.size() - 1;
-			}
-			lastNameCompleted = ((ServerPlayer) sortedNames.get(lastCompletionPlayer)).getName();
-		}
-		return str2 + lastNameCompleted;
-	}
-
+	// TODO: eliminate this.
+	/**/
 	public static void setSendMainText(boolean paramBoolean) {
 		serverOptions.setSendMainText(paramBoolean);
 	}
@@ -1079,7 +973,7 @@ public class JPServer extends JParanoia {
 				combatFrame.setVisible(true);
 				freezeButton.setEnabled(false);
 				combatButton.setEnabled(false);
-				//TODO: move the soundIsOn to the soundplayer.
+				// TODO: move the soundIsOn to the soundplayer.
 				if (soundIsOn && soundMenu.combatAlertMenuItem.isSelected()) {
 					soundPlayer.play(JPSounds.COMBAT_ALERT);
 				}
@@ -1087,7 +981,7 @@ public class JPServer extends JParanoia {
 					soundPlayer.startCombatMusic();
 					combatMusicIsPlaying = true;
 				}
-				sendCommand(ServerConstants.COMMANDS.GLOBAL_MESSAGE+"*** COMBAT ROUND BEGINS ***");
+				sendCommand(ServerConstants.COMMANDS.GLOBAL_MESSAGE + "*** COMBAT ROUND BEGINS ***");
 				absoluteChat("*** COMBAT ROUND BEGINS ***");
 				sendCommand(ServerConstants.COMMANDS.START_COMBAT_ROUND);
 				JPServer.freezePlayers();
@@ -1113,7 +1007,7 @@ public class JPServer extends JParanoia {
 		sendCommand(ServerConstants.COMMANDS.NOTIFY_UNDEATH + paramServerPlayer.getID());
 	}
 
-	//Strange present-tense name for a method..
+	// Strange present-tense name for a method..
 	public static void sendingPrivateMessage(ServerPlayer paramServerPlayer) {
 		sendCommand(ServerConstants.COMMANDS.PRIVATE_MESSAGE + paramServerPlayer.getID());
 	}
@@ -1143,12 +1037,13 @@ public class JPServer extends JParanoia {
 		announcement = "";
 	}
 
-	/*Mute and unmute.
-	 * Pretty explanitory, mutes or unmutes players, allowing them to talk.. or not
-	 * */
+	/*
+	 * Mute and unmute. Pretty explanitory, mutes or unmutes players, allowing them
+	 * to talk.. or not
+	 */
 	public static void mute(String paramString) {
 		sendCommand(ServerConstants.COMMANDS.MUTE_PLAYER + paramString);
-		//TODO: MOVE mute functionality to the soundPlayer.
+		// TODO: MOVE mute functionality to the soundPlayer.
 		if (soundIsOn && soundMenu.mutedUnmutedMenuItem.isSelected()) {
 			soundPlayer.play(JPSounds.MUTED);
 		}
@@ -1156,15 +1051,16 @@ public class JPServer extends JParanoia {
 
 	public static void unmute(String paramString) {
 		sendCommand(ServerConstants.COMMANDS.UNMUTE_PLAYER + paramString);
-		//TODO: MOVE mute functionality to the soundPlayer.
+		// TODO: MOVE mute functionality to the soundPlayer.
 		if (soundIsOn && soundMenu.mutedUnmutedMenuItem.isSelected()) {
 			soundPlayer.play(JPSounds.UNMUTED);
 		}
 	}
 
-
-	/* Freeze and Unfreeze players. Prevents certain (?) actions from being performed by players.
-	 * */
+	/*
+	 * Freeze and Unfreeze players. Prevents certain (?) actions from being
+	 * performed by players.
+	 */
 	public static void freezePlayers() {
 		serverOptions.setFrozen(true);
 		freezeButton.setText("Unfreeze");
@@ -1176,7 +1072,7 @@ public class JPServer extends JParanoia {
 			soundPlayer.play(JPSounds.FREEZE);
 		}
 	}
-	
+
 	public static void unfreezePlayers() {
 		serverOptions.setFrozen(false);
 		freezeButton.setText("Freeze");
@@ -1189,7 +1085,7 @@ public class JPServer extends JParanoia {
 		}
 	}
 
-	//TODO: Find out what this does
+	// TODO: Find out what this does
 	public static String stripComments(String paramString) {
 		StringBuilder localStringBuffer = new StringBuilder(paramString);
 		for (int j = 0; j < localStringBuffer.length(); j++) {
@@ -1233,7 +1129,7 @@ public class JPServer extends JParanoia {
 	}
 
 	public static synchronized void startServer() {
-		
+
 		if (serverOptions.isRegisterGame() && gameDescription.equals(defaultGameDescription)) {
 			setGameDescriptionMenuItem.doClick();
 		}
@@ -1296,7 +1192,6 @@ public class JPServer extends JParanoia {
 			useGmFont();
 		}
 	}
-	
 
 }
 
@@ -1316,10 +1211,11 @@ public class JPServer extends JParanoia {
  * paramString); }
  */
 
-/*public static void clearTitleMessage() { //TODO: Patch
-//myTitle.clearExtra(); frame.setTitle(ServerConstants.WELCOME_MESSAGE);
-sendCommand("013"); 
-}*/ 
+/*
+ * public static void clearTitleMessage() { //TODO: Patch
+ * //myTitle.clearExtra(); frame.setTitle(ServerConstants.WELCOME_MESSAGE);
+ * sendCommand("013"); }
+ */
 
 // private static TitleClass myTitle = new TitleClass("JParanoia Community
 // Server", ServerConstants.JPARANOIA_VERSION,false);
@@ -1356,22 +1252,18 @@ sendCommand("013");
  * renameMenuItemArray; //private static KickMenuItem[] kickMenuItemArray;
  */
 
-/*private static void clearInputLine() {
-	inputLine.selectAll();
-	inputLine.replaceSelection("");
-}*/
+/*
+ * private static void clearInputLine() { inputLine.selectAll();
+ * inputLine.replaceSelection(""); }
+ */
 
-/*private static void globalPM() {
-	sendCommand(ServerConstants.COMMANDS.PRIVATE_MESSAGE+"999");
-	String str = (String) JOptionPane.showInputDialog(null, "Enter your global private message:", "Global PM",
-			JOptionPane.PLAIN_MESSAGE, null, null, null);
-	if (str != null && !"".equals(str)) {
-		for (int i = 1; i < numberOfPCs; i++) {
-			if (players[i].loggedIn) {
-				players[i].specificSend("200" + players[i].getID() + myPlayer.getID() + str);
-				PMPane[i].addMyMessage(str);
-			}
-		}
-	}
-	sendCommand(ServerConstants.COMMANDS.END_PRIVATE_MESSAGE);
-}*/
+/*
+ * private static void globalPM() {
+ * sendCommand(ServerConstants.COMMANDS.PRIVATE_MESSAGE+"999"); String str =
+ * (String) JOptionPane.showInputDialog(null,
+ * "Enter your global private message:", "Global PM", JOptionPane.PLAIN_MESSAGE,
+ * null, null, null); if (str != null && !"".equals(str)) { for (int i = 1; i <
+ * numberOfPCs; i++) { if (players[i].loggedIn) { players[i].specificSend("200"
+ * + players[i].getID() + myPlayer.getID() + str); PMPane[i].addMyMessage(str);
+ * } } } sendCommand(ServerConstants.COMMANDS.END_PRIVATE_MESSAGE); }
+ */

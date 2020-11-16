@@ -7,6 +7,8 @@ import static java.awt.Color.red;
 import static java.awt.Color.white;
 import static java.awt.Color.yellow;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.net.InetAddress;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,8 +22,19 @@ import jparanoia.shared.JParanoia;
  * */
 public final class ServerConstants {
 	
+	//File locations
+	public static final String SERVER_ICON_LOC = "graphics/jparanoiaIcon.jpg";
+	
 	public static final String MY_PLAYER_ID = "00";
 	public static final int MY_PLAYER_NUMBER = 0;
+	
+	//Constants pertaining to the main window (fonts, colors, and so on)
+	public static final Font FONT_NORMAL = new Font(null, Font.PLAIN, 12);
+	public static final Font FONT_SPOOF = new Font(null, Font.BOLD, 16);
+	public static final Color[] COLORS_DARK = { new Color(0.1F, 0.1F, 0.1F), new Color(0.6F, 0.3F, 0.0F),
+			new Color(0.0F, 0.4F, 0.0F), new Color(0.2F, 0.6F, 0.4F), new Color(0.3F, 0.1F, 0.8F),
+			new Color(0.5F, 0.1F, 0.5F), new Color(0.3F, 0.3F, 0.3F), new Color(0.0F, 0.0F, 0.4F),
+			new Color(0.4F, 0.0F, 0.0F), new Color(0.1F, 0.4F, 0.4F) };
 	
 	//Version and patch notes contents
 	public static final JPVersionNumber VERSION_NUMBER = new JPVersionNumber( 1, 31, 4 );
