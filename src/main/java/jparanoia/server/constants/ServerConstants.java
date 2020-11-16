@@ -29,6 +29,9 @@ public final class ServerConstants {
 	public static final int MY_PLAYER_NUMBER = 0;
 	
 	//Constants pertaining to the main window (fonts, colors, and so on)
+	public static final String MENU_LABEL = "Server";
+	public static final int IDEAL_WIDTH = 770;
+	public static final int IDEAL_HEIGHT = 540;
 	public static final Font FONT_NORMAL = new Font(null, Font.PLAIN, 12);
 	public static final Font FONT_SPOOF = new Font(null, Font.BOLD, 16);
 	public static final Color[] COLORS_DARK = { new Color(0.1F, 0.1F, 0.1F), new Color(0.6F, 0.3F, 0.0F),
@@ -51,10 +54,6 @@ public final class ServerConstants {
 			"- SOUND IS NOW FUNCTIONAL!! MAKE SURE TO UNMUTE PROGRAM.\n"
 			+ "- Replaced default PreGens, with 'classic' RED CLEARANCE\n"
 			+ "- PreGens From PARANOIA XP's 'Crash Priority' supplement.\n\n";
-	
-	//Window and display constants
-	public static final int IDEAL_WIDTH = 770;
-	public static final int IDEAL_HEIGHT = 540;
 
 	//General messages for various purposes
 	public static final String KICKED_BY_SERVER_MESSAGE = "( * Kicked by server * )";
@@ -189,6 +188,7 @@ public final class ServerConstants {
 		return ROUTER_WARNING_MATCHER.replaceAll(localIP.getHostAddress());
 	}
 	
+	//TODO: abstract displayWrite away
 	public static void writeIntroduction() {
 		JParanoia.displayWrite(green, WELCOME_MESSAGE);
 		JParanoia.displayWrite(orange, JPARANOIA_WEBSITE_LINK);

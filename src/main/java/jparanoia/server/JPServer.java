@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.profiler.Profiler;
 
 import jparanoia.server.constants.ServerConstants;
+import jparanoia.server.menus.FreezeSpoofMenu;
+import jparanoia.server.menus.SpoofMenu;
 import jparanoia.server.window.WindowSetup;
 import jparanoia.shared.BrightColorArray;
 import jparanoia.shared.ErrorLogger;
@@ -114,12 +116,8 @@ public class JPServer extends JParanoia {
 	private static String styleEnd = "";
 	private static JPanel inputPanel;
 	private static JPanel PMContainer;
-	private static JPanel freezePanel;
-	private static JPanel spoofPanel;
-	private static JPanel spoofAndFreezePanel;
 	private static JMenuBar menuBar;
 
-	private static JMenu serverMenu;
 	private static JMenu fontMenu;
 	private static JMenu playerMenu;
 	private static JMenu npcMenu;
@@ -127,12 +125,8 @@ public class JPServer extends JParanoia {
 	private static JMenu sendImageMenu;
 	private static JMenu observersMenu;
 	private static JMenuItem sendGlobalPMMenuItem;
-	private static JMenuItem setGameDescriptionMenuItem;
 	private static JMenuItem showObserversListMenuItem;
 	private static JMenuItem announceObserversMenuItem;
-	private static JCheckBoxMenuItem registerGameMenuItem;
-	private static JCheckBox spoofCheckBox;
-	public static JComboBox<? extends ServerPlayer> spoofComboBox;
 
 	private static JLabel ipLabel;
 	private static JScrollPane scrollPane;
@@ -152,12 +146,25 @@ public class JPServer extends JParanoia {
 	private static PMAndStatusPanel[] pmstatus;
 
 	public JPServer() {
+		JComboBox<? extends ServerPlayer> spoofComboBox;
+		JCheckBox spoofCheckBox;
+		JMenu serverMenu;
+		JMenuItem setGameDescriptionMenuItem;
+		JCheckBoxMenuItem registerGameMenuItem;
 		chatDocument = new DefaultStyledDocument();
 		brightColors = new BrightColorArray().getColors();
 		// Code above this point seems to have no effect whether commented out or not.
+		// Code below is for initialization exclusively.
+		scrollPane = new JScrollPane(displayArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
+				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		charsheetPanel = new CharsheetPanel();
+		menuBar = new JMenuBar();
+		inputPanel = new JPanel();
+		sendImageMenu = new ServerImageMenu();
+		GridBagLayout localGridBagLayout1 = new GridBagLayout();
+		DataParser localDataParser = new DataParser();
 
 		Profiler profiler = new Profiler("JPServer");
-
 		setOptions();
 
 		try {
@@ -166,23 +173,17 @@ public class JPServer extends JParanoia {
 			logger.warn(ServerConstants.WARN_NO_IP);
 		}
 
-		charsheetAttributes = new SimpleAttributeSet();
-		charsheetAttributes.addAttribute(StyleConstants.Bold, true);
-		charsheetAttributes.addAttribute(StyleConstants.Family, "SansSerif");
-		charsheetAttributes.addAttribute(StyleConstants.Size, 12);
-
 		profiler.start("player list init");
-		DataParser localDataParser = new DataParser();
-		players = localDataParser.parsePlayerList("playerList.txt");
 
 		profiler.start("image data init");
 		logger.info("Processing imageData.txt:");
 		idp = new ImageDataParser();
 		idp.parseImageURLs("imageData.txt");
+		players = localDataParser.parsePlayerList("playerList.txt");
 		numberOfPlayers = players.length;
 		for (final ServerPlayer player : players) {
 			if (player.IS_PLAYER) {
-				numberOfPCs += 1;
+				numberOfPCs++;
 			}
 		}
 
@@ -199,7 +200,7 @@ public class JPServer extends JParanoia {
 				while (k >= 0 && nameJ.compareToIgnoreCase(nameK) < 0) {
 					ServerPlayer toReplace = JParanoia.nMgr.getPlayerAt(k);
 					JParanoia.nMgr.removeAtIndex(k);
-					JParanoia.nMgr.addPlayerAtIndex(toReplace,j);
+					JParanoia.nMgr.addPlayerAtIndex(toReplace, j);
 					j = k;
 					k--;
 					nameJ = JParanoia.nMgr.getPlayerAt(j).getName();
@@ -209,140 +210,38 @@ public class JPServer extends JParanoia {
 		}
 		players[0].loggedIn = true;
 		myPlayer = players[0];
+		ServerPlayer[] arrayOfServerPlayer = new ServerPlayer[players.length - 1];
+		System.arraycopy(players, 1, arrayOfServerPlayer, 0, players.length - 1);
 
 		profiler.start("further frame init");
 		WindowSetup.setupServerTextFrame(displayArea);
-
-		scrollPane = new JScrollPane(displayArea, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
-				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-
-		textAttributes = new SimpleAttributeSet();
-		textAttributes.addAttribute(StyleConstants.Foreground, Color.white);
-		textAttributes.addAttribute(StyleConstants.Size, prefs.getPref(15));
-		textAttributes.addAttribute(StyleConstants.Family, prefs.getPref(16));
-		systemTextAttributes.addAttribute(StyleConstants.Foreground, Color.gray);
+		inputLine = WindowSetup.setupInputTextPane(serverOptions, JParanoia.nMgr);
+		charsheetAttributes = WindowSetup.getCharsheetArrs();
+		textAttributes = WindowSetup.getTextPaneArrs(prefs);
+		/*startServerMenuItem = WindowSetup.getStartServerMenuItem();
+		stopServerMenuItem = WindowSetup.getStopServerMenuItem();
+		/*registerGameMenuItem = WindowSetup.getRegisterGameMenuItem(prefs, serverOptions, gameDescription,
+				defaultGameDescription);
+		setGameDescriptionMenuItem = WindowSetup.getDescriptionSetMenuItem(gameDescription, serverOptions);
+		serverMenu = WindowSetup.getServerMenu(startServerMenuItem, stopServerMenuItem,
+				(JMenuItem) registerGameMenuItem, setGameDescriptionMenuItem, localIP);*/
+		FreezeSpoofMenu fsm = new FreezeSpoofMenu(serverOptions, inputLine, arrayOfServerPlayer);
 		setColorScheme();
+		// WHY?
 		new PlainDocument();
-
-		// Set up the Input text box
-		WindowSetup.setupInputTextPane(inputLine, serverOptions, JParanoia.nMgr);
 
 		inputScrollPane = new JScrollPane(inputLine, ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS,
 				ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		ServerPlayer[] arrayOfServerPlayer = new ServerPlayer[players.length - 1];
-		System.arraycopy(players, 1, arrayOfServerPlayer, 0, players.length - 1);
-		spoofComboBox = new JComboBox<>(arrayOfServerPlayer);
-		spoofComboBox.addActionListener(paramAnonymousActionEvent -> {
-			playerToSpoof = (ServerPlayer) spoofComboBox.getSelectedItem();
-			if (spoofCheckBox.isSelected()) {
-				currentPlayerID = playerToSpoof.getID();
-			}
-			inputLine.requestFocus();
-		});
-		playerToSpoof = (ServerPlayer) spoofComboBox.getSelectedItem();
-		spoofComboBox.setMaximumSize(new Dimension(130, 20));
-		spoofComboBox.setPreferredSize(new Dimension(130, 20));
-		spoofComboBox.setMinimumSize(new Dimension(130, 20));
-		spoofCheckBox = new JCheckBox();
-		spoofCheckBox.addActionListener(paramAnonymousActionEvent -> {
-			if (spoofCheckBox.isSelected()) {
-				currentPlayerID = playerToSpoof.getID();
-				inputLine.setFont(ServerConstants.FONT_SPOOF);
-			} else {
-				currentPlayerID = "00";
-				inputLine.setFont(ServerConstants.FONT_NORMAL);
-			}
-			inputLine.requestFocus();
-		});
-		spoofPanel = new JPanel();
-		spoofPanel.setLayout(new BoxLayout(spoofPanel, BoxLayout.X_AXIS));
-		spoofPanel.add(Box.createRigidArea(new Dimension(2, 0)));
-		spoofPanel.add(spoofComboBox);
-		spoofPanel.add(Box.createRigidArea(new Dimension(5, 0)));
-		spoofPanel.add(spoofCheckBox);
-		spoofPanel.add(Box.createRigidArea(new Dimension(2, 0)));
-		spoofPanel.setBorder(BorderFactory.createTitledBorder("Spoof"));
-		freezePanel = new JPanel();
-		freezePanel.setLayout(new GridLayout(1, 2));
-		freezeButton = new JButton("Freeze");
-		freezeButton.addActionListener(paramAnonymousActionEvent -> {
-			if (!serverOptions.isFrozen()) {
-				freezePlayers();
-			} else {
-				unfreezePlayers();
-			}
-		});
-		combatButton = new JButton("Combat!");
-		combatButton.addActionListener(paramAnonymousActionEvent -> JPServer.startCombat());
-		combatButton.setEnabled(false);
-		freezePanel.add(combatButton);
-		freezePanel.add(freezeButton);
-		spoofAndFreezePanel = new JPanel();
-		spoofAndFreezePanel.setLayout(new BoxLayout(spoofAndFreezePanel, BoxLayout.Y_AXIS));
-		spoofAndFreezePanel.add(spoofPanel);
-		spoofAndFreezePanel.add(Box.createRigidArea(new Dimension(0, 5)));
-		spoofAndFreezePanel.add(freezePanel);
-		inputPanel = new JPanel();
+
+		// Copy of what is in the action listener.... interesting.
+		// playerToSpoof = (ServerPlayer) spoofComboBox.getSelectedItem();
+
 		inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.X_AXIS));
-		inputPanel.add(spoofAndFreezePanel);
+		inputPanel.add(fsm);
 		inputPanel.add(Box.createRigidArea(new Dimension(5, 0)));
 		inputPanel.add(inputScrollPane);
-		charsheetPanel = new CharsheetPanel();
-		menuBar = new JMenuBar();
-		serverMenu = new JMenu("Server");
 
-		// TODO: Organize these.
-		startServerMenuItem = new JMenuItem("Start server");
-		startServerMenuItem.setToolTipText("Opens your computer for new connections.");
-		startServerMenuItem.addActionListener(paramAnonymousActionEvent -> startServer());
-
-		// TODO: Organize these.
-		stopServerMenuItem = new JMenuItem("Stop server");
-		stopServerMenuItem.setToolTipText("Stops your computer from accepting new connections.");
-		stopServerMenuItem.addActionListener(paramAnonymousActionEvent -> stopServer());
-
-		registerGameMenuItem = new JCheckBoxMenuItem("Register Game");
-		registerGameMenuItem.setToolTipText(
-				"<HTML>When checked, your server will be made available<BR>to players via the JParanoia Game Registry so they<BR>will not need the IP address of your server.</HTML>");
-		registerGameMenuItem.setSelected(prefs.getPref(31).equals(true));
-		registerGameMenuItem.addActionListener(paramAnonymousActionEvent -> {
-			if (serverOptions.isRegisterGame()) {
-				serverOptions.setRegisterGame(false);
-				if (serverOptions.isGameRegistered()) {
-					GameRegistrar.removeGame();
-				}
-			} else {
-				serverOptions.setRegisterGame(true);
-				if (serverOptions.isServerRunning()) {
-					if (gameDescription.equals(defaultGameDescription)) {
-						setGameDescriptionMenuItem.doClick();
-					}
-					GameRegistrar.addGame(gameDescription);
-				}
-			}
-		});
-		setGameDescriptionMenuItem = new JMenuItem("Set Game Description...");
-		setGameDescriptionMenuItem
-				.setToolTipText("<HTML>This changes the name of your game<BR> on the JParanoia Game Registry.</HTML>");
-		setGameDescriptionMenuItem.addActionListener(paramAnonymousActionEvent -> {
-			String str = (String) JOptionPane.showInputDialog(null, "Enter a description for your game:",
-					"Set Game Description...", JOptionPane.PLAIN_MESSAGE, null, null, gameDescription);
-			if (str != null && !str.equals("") && !str.equals(gameDescription)) {
-				gameDescription = str;
-				if (serverOptions.isGameRegistered()) {
-					GameRegistrar.addGame(gameDescription);
-				}
-			}
-		});
-		serverMenu.add(startServerMenuItem);
-		serverMenu.add(stopServerMenuItem);
-		serverMenu.addSeparator();
-		serverMenu.add(registerGameMenuItem);
-		serverMenu.add(setGameDescriptionMenuItem);
 		stopServerMenuItem.setEnabled(false);
-		serverMenu.addSeparator();
-		ipLabel = new JLabel("  Local IP :   " + localIP.getHostAddress());
-		serverMenu.add(ipLabel);
 		menuBar.add(serverMenu);
 		fontMenu = new FontMenu("Font");
 		menuBar.add(fontMenu);
@@ -365,7 +264,6 @@ public class JPServer extends JParanoia {
 		});
 		globalPMMenu.add(sendGlobalPMMenuItem);
 		menuBar.add(globalPMMenu);
-		sendImageMenu = new ServerImageMenu();
 		menuBar.add(sendImageMenu);
 		observersMenu = new JMenu("Observers");
 		hearObserversMenuItem = new JCheckBoxMenuItem("Hear Observers");
@@ -381,12 +279,12 @@ public class JPServer extends JParanoia {
 		observersMenu.add(showObserversListMenuItem);
 		menuBar.add(observersMenu);
 		Container localContainer = frame.getContentPane();
-		new JPanel();
-		GridBagLayout localGridBagLayout1 = new GridBagLayout();
-		GridBagConstraints localGridBagConstraints1 = new GridBagConstraints();
+		// WHY?
+		// new JPanel();
 		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, charsheetPanel, scrollPane);
 		splitPane.setDividerLocation(122);
 		splitPane.setOneTouchExpandable(true);
+		GridBagConstraints localGridBagConstraints1 = new GridBagConstraints();
 		localGridBagConstraints1.gridx = 0;
 		localGridBagConstraints1.gridy = 0;
 		localGridBagConstraints1.weighty = 1.0D;
@@ -438,6 +336,7 @@ public class JPServer extends JParanoia {
 		localGridBagConstraints2.weightx = 0.0D;
 		localGridBagLayout2.setConstraints(PMContainer, localGridBagConstraints2);
 		localContainer.add(PMContainer);
+		// WHY?
 		new JOptionPane();
 		new JOptionPane();
 		myPlayer = players[0];
