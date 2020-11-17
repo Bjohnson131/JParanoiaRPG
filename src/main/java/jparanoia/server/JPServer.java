@@ -110,6 +110,7 @@ public class JPServer extends JParanoia {
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
 	private static FreezeSpoofMenu fsm;
+	private static MenuBar serverMenu;
 	private static ServerPlayer pmTargetPlayer;
 	private static JScrollPane inputScrollPane;
 	private static String announcement = "";
@@ -214,7 +215,7 @@ public class JPServer extends JParanoia {
 		inputLine = WindowSetup.setupInputTextPane(serverOptions, JParanoia.nMgr);
 		charsheetAttributes = WindowSetup.getCharsheetArrs();
 		textAttributes = WindowSetup.getTextPaneArrs(prefs);
-		MenuBar serverMenu = new MenuBar(prefs, serverOptions, gameDescription, defaultGameDescription);
+		serverMenu = new MenuBar(prefs, serverOptions, gameDescription, defaultGameDescription);
 		fsm = new FreezeSpoofMenu(serverOptions, inputLine, arrayOfServerPlayer);
 		setColorScheme();
 		// WHY?
@@ -927,7 +928,7 @@ public class JPServer extends JParanoia {
 	}
 
 	/*
-	 * Mute and unmute. Pretty explanitory, mutes or unmutes players, allowing them
+	 * Mute and unmute. Pretty explainitory, mutes or unmutes players, allowing them
 	 * to talk.. or not
 	 */
 	public static void mute(String paramString) {
@@ -1018,29 +1019,6 @@ public class JPServer extends JParanoia {
 	}
 
 	public static synchronized void startServer() {
-
-		if (serverOptions.isRegisterGame() && gameDescription.equals(defaultGameDescription)) {
-			setGameDescriptionMenuItem.doClick();
-		}
-		inputLine.setEnabled(true);
-		inputLine.requestFocus();
-		servSocketThread = new ServerSocketThread();
-		servSocketThread.start();
-		if (serverOptions.isRegisterGame()) {
-			GameRegistrar.addGame(gameDescription);
-			String str = GameRegistrar.getIP();
-			if (!"fail".equals(str)) {
-				ipLabel.setText("  IP: " + str);
-				if (!serverOptions.isBehindRouter() && !str.equals(localIP.getHostAddress())) {
-					serverOptions.setBehindRouter(true);
-					JParanoia.warningMessage(ServerConstants.WARN_BEHIND_ROUTER,
-							ServerConstants.getRouterWarning(localIP));
-				}
-			}
-		}
-		if (soundIsOn && soundMenu.connectedDisconnectedMenuItem.isSelected()) {
-			soundPlayer.play(JPSounds.CONNECTED);
-		}
 	}
 
 	public static void stopServer() {
