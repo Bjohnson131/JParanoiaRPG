@@ -15,6 +15,8 @@ import jparanoia.server.constants.ServerConstants;
 import jparanoia.server.window.WindowSetup;
 
 public class SpoofMenu extends JPanel {
+	private ServerPlayer playerToSpoof;
+	private String currentPlayerID = "00";
 
 	/**
 	 * 
@@ -26,8 +28,8 @@ public class SpoofMenu extends JPanel {
 
 	public SpoofMenu(JTextArea inputArea, ServerPlayer[] players) {
 		super();
-		this.spoofCheckBox = SpoofMenu.getSpoofCheckBox(inputArea);
-		this.spoofComboBox = SpoofMenu.getPlayerSpoofComboBox(players, inputArea, this.spoofCheckBox);
+		this.spoofCheckBox = getSpoofCheckBox(inputArea);
+		this.spoofComboBox = getPlayerSpoofComboBox(players, inputArea, this.spoofCheckBox);
 
 		this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		this.add(Box.createRigidArea(new Dimension(2, 0)));
@@ -39,14 +41,14 @@ public class SpoofMenu extends JPanel {
 
 	}
 
-	private static JCheckBox getSpoofCheckBox(JTextArea inputArea) {
+	private JCheckBox getSpoofCheckBox(JTextArea inputArea) {
 		JCheckBox spoofCheckBox = new JCheckBox();
 		spoofCheckBox.addActionListener(paramAnonymousActionEvent -> {
 			if (spoofCheckBox.isSelected()) {
-				currentPlayerID = playerToSpoof.getID();
+				this.currentPlayerID = this.playerToSpoof.getID();
 				inputArea.setFont(ServerConstants.FONT_SPOOF);
 			} else {
-				currentPlayerID = "00";
+				this.currentPlayerID = "00";
 				inputArea.setFont(ServerConstants.FONT_NORMAL);
 			}
 			inputArea.requestFocus();
@@ -54,19 +56,40 @@ public class SpoofMenu extends JPanel {
 		return spoofCheckBox;
 	}
 
-	private static JComboBox<? extends ServerPlayer> getPlayerSpoofComboBox(ServerPlayer[] aosp, JTextArea inputArea,
+	private  JComboBox<? extends ServerPlayer> getPlayerSpoofComboBox(ServerPlayer[] aosp, JTextArea inputArea,
 			JCheckBox spoofBox) {
-		JComboBox spoofComboBox = new JComboBox<>(aosp);
+		JComboBox<? extends ServerPlayer> spoofComboBox = new JComboBox<>(aosp);
 		spoofComboBox.addActionListener(paramAnonymousActionEvent -> {
 			playerToSpoof = (ServerPlayer) spoofComboBox.getSelectedItem();
 			if (spoofBox.isSelected()) {
-				currentPlayerID = playerToSpoof.getID();
+				this.currentPlayerID = this.playerToSpoof.getID();
 			}
 			inputArea.requestFocus();
 		});
 		spoofComboBox.setMaximumSize(new Dimension(130, 20));
 		spoofComboBox.setPreferredSize(new Dimension(130, 20));
 		spoofComboBox.setMinimumSize(new Dimension(130, 20));
+		return spoofComboBox;
+	}
+	
+	public void doClickAction() {
+		spoofCheckBox.doClick();
+	}
+	
+	public void getFocus() {
+		spoofCheckBox.requestFocus();
+	}
+	
+	public boolean isSpoofMode() {
+		return spoofCheckBox.isSelected();
+	}
+	
+	public String getCurrentPlayerID() {
+		return this.currentPlayerID;
+	}
+	
+	public ServerPlayer getPlayerToSpoof() {
+		return this.playerToSpoof;
 	}
 
 }

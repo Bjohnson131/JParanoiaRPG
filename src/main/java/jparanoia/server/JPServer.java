@@ -52,6 +52,7 @@ import org.slf4j.profiler.Profiler;
 
 import jparanoia.server.constants.ServerConstants;
 import jparanoia.server.menus.FreezeSpoofMenu;
+import jparanoia.server.menus.MenuBar;
 import jparanoia.server.menus.SpoofMenu;
 import jparanoia.server.window.WindowSetup;
 import jparanoia.shared.BrightColorArray;
@@ -108,7 +109,7 @@ public class JPServer extends JParanoia {
 	private static int randInt = rand.nextInt(1000);
 	private static String defaultGameDescription = "JParanoia Community " + ServerConstants.JPARANOIA_VERSION + " ("
 			+ randInt + ")";
-	private static ServerPlayer playerToSpoof;
+	private static FreezeSpoofMenu fsm;
 	private static ServerPlayer pmTargetPlayer;
 	private static JScrollPane inputScrollPane;
 	private static String announcement = "";
@@ -146,11 +147,6 @@ public class JPServer extends JParanoia {
 	private static PMAndStatusPanel[] pmstatus;
 
 	public JPServer() {
-		JComboBox<? extends ServerPlayer> spoofComboBox;
-		JCheckBox spoofCheckBox;
-		JMenu serverMenu;
-		JMenuItem setGameDescriptionMenuItem;
-		JCheckBoxMenuItem registerGameMenuItem;
 		chatDocument = new DefaultStyledDocument();
 		brightColors = new BrightColorArray().getColors();
 		// Code above this point seems to have no effect whether commented out or not.
@@ -218,14 +214,8 @@ public class JPServer extends JParanoia {
 		inputLine = WindowSetup.setupInputTextPane(serverOptions, JParanoia.nMgr);
 		charsheetAttributes = WindowSetup.getCharsheetArrs();
 		textAttributes = WindowSetup.getTextPaneArrs(prefs);
-		/*startServerMenuItem = WindowSetup.getStartServerMenuItem();
-		stopServerMenuItem = WindowSetup.getStopServerMenuItem();
-		/*registerGameMenuItem = WindowSetup.getRegisterGameMenuItem(prefs, serverOptions, gameDescription,
-				defaultGameDescription);
-		setGameDescriptionMenuItem = WindowSetup.getDescriptionSetMenuItem(gameDescription, serverOptions);
-		serverMenu = WindowSetup.getServerMenu(startServerMenuItem, stopServerMenuItem,
-				(JMenuItem) registerGameMenuItem, setGameDescriptionMenuItem, localIP);*/
-		FreezeSpoofMenu fsm = new FreezeSpoofMenu(serverOptions, inputLine, arrayOfServerPlayer);
+		MenuBar serverMenu = new MenuBar(prefs, serverOptions, gameDescription, defaultGameDescription);
+		fsm = new FreezeSpoofMenu(serverOptions, inputLine, arrayOfServerPlayer);
 		setColorScheme();
 		// WHY?
 		new PlainDocument();
@@ -818,11 +808,11 @@ public class JPServer extends JParanoia {
 		String str1 = paramString;
 		str1 = str1.replace('\n', ' ');
 		if (!"".equals(str1) && !" ".equals(str1) && !str1.endsWith("\n")) {
-			if ((str1.startsWith("/") || str1.startsWith("'")) && !spoofCheckBox.isSelected()
+			if ((str1.startsWith("/") || str1.startsWith("'")) && !fsm.spoofMenu.isSpoofMode()
 					&& !serverOptions.isAllowGMEmotes()) {
 				JParanoia.warningMessage("GM Emotes not allowed",
 						"You have attempted to use the speech or action\nkey while not spoofing a character.\n\nTo permit this, go to the Options menu and\nenable \"Allow GM Emotes\".");
-				spoofCheckBox.requestFocus();
+				fsm.spoofMenu.getFocus();
 				inputLine.setText(inputLine.getText().substring(0, inputLine.getText().length() - 1));
 			} else {
 				String str2;
@@ -846,8 +836,8 @@ public class JPServer extends JParanoia {
 					sendCommand(str2 + currentPlayerID + str1);
 					generalChat(currentPlayerID + str1);
 				}
-				if (spoofCheckBox.isSelected() && optionsMenu.singleUseSpoofMenuItem.isSelected()) {
-					spoofCheckBox.doClick();
+				if (fsm.spoofMenu.isSpoofMode() && optionsMenu.singleUseSpoofMenuItem.isSelected()) {
+					fsm.spoofMenu.doClickAction();
 				}
 				inputLine.setText("");
 			}
@@ -1016,7 +1006,7 @@ public class JPServer extends JParanoia {
 	}
 
 	public static void repaintMenus() {
-		spoofComboBox.repaint();
+		fsm.repaint();
 		charsheetPanel.playerComboBox.repaint();
 	}
 

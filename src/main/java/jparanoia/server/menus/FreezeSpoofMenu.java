@@ -16,17 +16,17 @@ public class FreezeSpoofMenu extends JPanel{
 	 * 
 	 */
 	private static final long serialVersionUID = -9207346160220387427L;
-	public FreezeMenu fm;
-	public SpoofMenu sm;
+	public FreezeMenu freezeMenu;
+	public SpoofMenu spoofMenu;
 	
 	public FreezeSpoofMenu(ServerOptions opts, JTextArea inputArea, ServerPlayer[] players) {
 		super();
-		fm = new FreezeMenu(opts);
-		sm = new SpoofMenu(inputArea, players);
+		freezeMenu = new FreezeMenu(opts);
+		spoofMenu = new SpoofMenu(inputArea, players);
 
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.add(sm);
+		this.add(spoofMenu);
 		this.add(Box.createRigidArea(new Dimension(0, 5)));
-		this.add(fm);
+		this.add(freezeMenu);
 	}
 }

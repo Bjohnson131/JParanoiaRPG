@@ -142,17 +142,7 @@ public class WindowSetup {
 		return registerGameMenuItem;
 	}
 	
-	public static JMenu getServerMenu(JMenuItem startServer,JMenuItem stopServer,JMenuItem registerGame, JMenuItem gamedesc, InetAddress localIP) {
-		JMenu toReturn = new JMenu(ServerConstants.MENU_LABEL);
-		toReturn.add(startServer);
-		toReturn.add(stopServer);
-		toReturn.addSeparator();
-		toReturn.add(registerGame);
-		toReturn.add(gamedesc);
-		toReturn.addSeparator();
-		toReturn.add(new JLabel("  Local IP :   " + localIP.getHostAddress()));
-		return toReturn;
-	}
+
 	
 	/* This is a class which processes the text in the input bar
 	 * based on what is inside, and the current options.
